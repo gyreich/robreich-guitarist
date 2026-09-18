@@ -12,6 +12,8 @@ Sublime Text Info for Rob/
 # (kept on disk for reference, not tracked in the repo)
 .source-assets/
 
-# Audio files and the PDF — not embedded or linked anywhere in site.html
+# Audio files and the PDF — not embedded or linked anywhere in index.html,
+# except the tracks actually used in the Recordings section
 *.mp3
+!recordings/*.mp3
 *.pdf
