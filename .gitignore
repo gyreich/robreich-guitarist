@@ -1,0 +1,17 @@
+# OS / editor junk
+.DS_Store
+untitled folder.textClipping
+
+# Unrelated personal/business files, not part of the site
+Sublime Text Info for Rob/
+
+# Scratch output used while assembling the artifact-wrapped HTML for publishing
+.build/
+
+# Rejected/unused image crops and drafts from earlier design exploration
+# (kept on disk for reference, not tracked in the repo)
+.source-assets/
+
+# Audio files and the PDF — not embedded or linked anywhere in site.html
+*.mp3
+*.pdf
