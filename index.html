@@ -587,26 +587,140 @@
     align-items: start;
   }
   @media (max-width: 760px) { .recordings-grid { grid-template-columns: 1fr; } }
-  .track-list {
+  /* ---------- PLAYLIST PLAYER ---------- */
+  .player {
+    background: #1B160F;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 4px 24px;
+  }
+  .playlist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .playlist-item {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(224,178,103,0.16);
+    cursor: pointer;
   }
-  .track-row {
-    padding: 22px 0;
-    border-bottom: 1px solid var(--line);
+  .playlist-item:last-child { border-bottom: none; }
+  .playlist-play {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(237,230,214,0.28);
+    background: transparent;
+    color: #E0B267;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
   }
-  .track-row:first-child { border-top: 1px solid var(--line); }
-  .track-title {
-    display: block;
+  .playlist-item:hover .playlist-play,
+  .playlist-play:focus-visible {
+    border-color: #E0B267;
+  }
+  .playlist-play svg { width: 13px; height: 13px; }
+  .playlist-play .icon-pause { display: none; }
+  .playlist-item.is-active .playlist-play {
+    border-color: #E0B267;
+    background: rgba(224,178,103,0.14);
+  }
+  .playlist-item.is-active.is-playing .playlist-play .icon-play { display: none; }
+  .playlist-item.is-active.is-playing .playlist-play .icon-pause { display: block; }
+  .playlist-title {
+    flex: 1 1 auto;
     font-family: 'Fraunces', Georgia, serif;
     font-weight: 500;
-    font-size: 22px;
-    color: var(--text);
-    margin-bottom: 12px;
+    font-size: 17px;
+    color: #DCD2BC;
+    transition: color 0.15s ease;
   }
-  .track-row audio {
-    width: 100%;
+  .playlist-item.is-active .playlist-title { color: #F3ECDC; }
+  .playlist-duration {
+    flex: 0 0 auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: #8C816B;
+  }
+  .player-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 0;
+    border-top: 1px solid rgba(224,178,103,0.22);
+    margin-top: 2px;
+  }
+  .player-playpause {
+    flex: 0 0 auto;
+    width: 36px;
     height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(237,230,214,0.3);
+    background: transparent;
+    color: #F3ECDC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .player-playpause:hover, .player-playpause:focus-visible { border-color: #E0B267; }
+  .player-playpause svg { width: 15px; height: 15px; }
+  .player-playpause .icon-pause { display: none; }
+  .player.is-playing .player-playpause .icon-play { display: none; }
+  .player.is-playing .player-playpause .icon-pause { display: block; }
+  .player-time {
+    flex: 0 0 auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.02em;
+    color: #8C816B;
+    min-width: 32px;
+  }
+  .player-time:last-child { text-align: right; }
+  .player-progress {
+    flex: 1 1 auto;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(237,230,214,0.18);
+    outline: none;
+    cursor: pointer;
+  }
+  .player-progress::-webkit-slider-runnable-track {
+    height: 3px;
+    border-radius: 2px;
+    background: transparent;
+  }
+  .player-progress::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #E0B267;
+    cursor: pointer;
+    margin-top: -4px;
+  }
+  .player-progress::-moz-range-track {
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(237,230,214,0.18);
+  }
+  .player-progress::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border: none;
+    border-radius: 50%;
+    background: #E0B267;
+    cursor: pointer;
   }
   .recordings-note {
     margin-top: 18px;
@@ -1005,27 +1119,59 @@
     </div>
     <div class="recordings-grid">
       <div>
-        <div class="track-list">
-          <div class="track-row">
-            <span class="track-title">New Day</span>
-            <audio controls preload="none" src="recordings/new-day.mp3"></audio>
+        <div class="player">
+          <ul class="playlist">
+            <li class="playlist-item is-active" data-src="recordings/new-day.mp3" data-duration="3:46">
+              <button type="button" class="playlist-play" aria-label="Play New Day">
+                <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l12 7-12 7V5z" fill="currentColor"/></svg>
+                <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>
+              </button>
+              <span class="playlist-title">New Day</span>
+              <span class="playlist-duration">3:46</span>
+            </li>
+            <li class="playlist-item" data-src="recordings/new-swing.mp3" data-duration="4:14">
+              <button type="button" class="playlist-play" aria-label="Play New Swing">
+                <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l12 7-12 7V5z" fill="currentColor"/></svg>
+                <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>
+              </button>
+              <span class="playlist-title">New Swing</span>
+              <span class="playlist-duration">4:14</span>
+            </li>
+            <li class="playlist-item" data-src="recordings/fast-lane.mp3" data-duration="7:05">
+              <button type="button" class="playlist-play" aria-label="Play Fast Lane">
+                <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l12 7-12 7V5z" fill="currentColor"/></svg>
+                <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>
+              </button>
+              <span class="playlist-title">Fast Lane</span>
+              <span class="playlist-duration">7:05</span>
+            </li>
+            <li class="playlist-item" data-src="recordings/homeward.mp3" data-duration="7:09">
+              <button type="button" class="playlist-play" aria-label="Play Homeward">
+                <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l12 7-12 7V5z" fill="currentColor"/></svg>
+                <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>
+              </button>
+              <span class="playlist-title">Homeward</span>
+              <span class="playlist-duration">7:09</span>
+            </li>
+            <li class="playlist-item" data-src="recordings/falling.mp3" data-duration="7:42">
+              <button type="button" class="playlist-play" aria-label="Play Falling">
+                <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l12 7-12 7V5z" fill="currentColor"/></svg>
+                <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>
+              </button>
+              <span class="playlist-title">Falling</span>
+              <span class="playlist-duration">7:42</span>
+            </li>
+          </ul>
+          <div class="player-bar">
+            <button type="button" class="player-playpause" id="playerPlayPause" aria-label="Play">
+              <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l12 7-12 7V5z" fill="currentColor"/></svg>
+              <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>
+            </button>
+            <span class="player-time" id="playerCurrent">0:00</span>
+            <input type="range" class="player-progress" id="playerProgress" min="0" max="100" value="0" step="0.1" aria-label="Seek">
+            <span class="player-time" id="playerDuration">3:46</span>
           </div>
-          <div class="track-row">
-            <span class="track-title">New Swing</span>
-            <audio controls preload="none" src="recordings/new-swing.mp3"></audio>
-          </div>
-          <div class="track-row">
-            <span class="track-title">Fast Lane</span>
-            <audio controls preload="none" src="recordings/fast-lane.mp3"></audio>
-          </div>
-          <div class="track-row">
-            <span class="track-title">Homeward</span>
-            <audio controls preload="none" src="recordings/homeward.mp3"></audio>
-          </div>
-          <div class="track-row">
-            <span class="track-title">Falling</span>
-            <audio controls preload="none" src="recordings/falling.mp3"></audio>
-          </div>
+          <audio id="playerAudio" preload="none"></audio>
         </div>
         <p class="recordings-note">Original compositions, written and performed by Rob Reich.</p>
       </div>
@@ -1419,5 +1565,128 @@
         viewLink.href = 'https://www.youtube.com/playlist?list=' + listId;
       });
     });
+  })();
+
+  // ---------- Recordings playlist player ----------
+  (function () {
+    var player = document.querySelector('.player');
+    var audio = document.getElementById('playerAudio');
+    var playPauseBtn = document.getElementById('playerPlayPause');
+    var progress = document.getElementById('playerProgress');
+    var curTimeEl = document.getElementById('playerCurrent');
+    var durTimeEl = document.getElementById('playerDuration');
+    if (!player || !audio) return;
+
+    var items = Array.prototype.slice.call(player.querySelectorAll('.playlist-item'));
+    var activeIndex = 0;
+
+    function formatTime(sec) {
+      if (!isFinite(sec) || isNaN(sec)) return '0:00';
+      sec = Math.max(0, Math.floor(sec));
+      var m = Math.floor(sec / 60);
+      var s = sec % 60;
+      return m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    function setProgressFill(pct) {
+      progress.style.background =
+        'linear-gradient(to right, #E0B267 ' + pct + '%, rgba(237,230,214,0.18) ' + pct + '%)';
+    }
+
+    function setActive(index) {
+      items.forEach(function (it, i) {
+        it.classList.toggle('is-active', i === index);
+      });
+      activeIndex = index;
+      durTimeEl.textContent = items[index].getAttribute('data-duration');
+      curTimeEl.textContent = '0:00';
+      progress.value = 0;
+      setProgressFill(0);
+    }
+
+    function loadTrack(index, autoplay) {
+      setActive(index);
+      audio.src = items[index].getAttribute('data-src');
+      audio.load();
+      if (autoplay) {
+        audio.play().catch(function () {});
+      }
+    }
+
+    function togglePlay(index) {
+      if (index === activeIndex && audio.src) {
+        if (audio.paused) {
+          audio.play().catch(function () {});
+        } else {
+          audio.pause();
+        }
+      } else {
+        loadTrack(index, true);
+      }
+    }
+
+    items.forEach(function (item, i) {
+      item.querySelector('.playlist-play').addEventListener('click', function (e) {
+        e.stopPropagation();
+        togglePlay(i);
+      });
+      item.addEventListener('click', function () {
+        togglePlay(i);
+      });
+    });
+
+    playPauseBtn.addEventListener('click', function () {
+      togglePlay(activeIndex);
+    });
+
+    audio.addEventListener('play', function () {
+      player.classList.add('is-playing');
+      items[activeIndex].classList.add('is-playing');
+    });
+    audio.addEventListener('pause', function () {
+      player.classList.remove('is-playing');
+      items[activeIndex].classList.remove('is-playing');
+    });
+
+    audio.addEventListener('timeupdate', function () {
+      curTimeEl.textContent = formatTime(audio.currentTime);
+      if (audio.duration && isFinite(audio.duration)) {
+        var pct = (audio.currentTime / audio.duration) * 100;
+        progress.value = pct;
+        setProgressFill(pct);
+      }
+    });
+
+    function updateDuration() {
+      if (audio.duration && isFinite(audio.duration)) {
+        durTimeEl.textContent = formatTime(audio.duration);
+      } else if (audio.duration === Infinity) {
+        // Some servers omit a content-length hint, which leaves Chrome
+        // unable to compute duration until playback seeks near the end.
+        audio.currentTime = 1e101;
+        setTimeout(function () {
+          audio.currentTime = 0;
+        }, 200);
+      }
+    }
+    audio.addEventListener('loadedmetadata', updateDuration);
+    audio.addEventListener('durationchange', updateDuration);
+
+    audio.addEventListener('ended', function () {
+      loadTrack((activeIndex + 1) % items.length, true);
+    });
+
+    progress.addEventListener('input', function () {
+      if (audio.duration && isFinite(audio.duration)) {
+        audio.currentTime = (progress.value / 100) * audio.duration;
+        setProgressFill(progress.value);
+      }
+    });
+
+    audio.addEventListener('error', function () {
+      curTimeEl.textContent = '—';
+    });
+
+    setActive(0);
   })();
 </script>
