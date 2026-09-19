@@ -1483,7 +1483,42 @@
 
     var cx = 200, cy = 200, rOuter = 176, rInner = 64;
     var n = modes.length;
-    var goldTones = ['#E0A344','#D6974B','#CB8B4F','#BFA05C','#8FA0A8','#7B90C2','#6C7FCE'];
+
+    // Build the wedge palette from the site's own gold/indigo tokens (so it
+    // automatically follows light/dark mode) instead of a hardcoded rainbow.
+    function hexToRgb(hex) {
+      hex = hex.trim().replace('#', '');
+      return [parseInt(hex.slice(0, 2), 16), parseInt(hex.slice(2, 4), 16), parseInt(hex.slice(4, 6), 16)];
+    }
+    function rgbToHex(rgb) {
+      return '#' + rgb.map(function (v) {
+        return Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0');
+      }).join('');
+    }
+    function multiStopGradient(colors, steps) {
+      var rgbs = colors.map(hexToRgb);
+      var last = rgbs.length - 1;
+      var result = [];
+      for (var i = 0; i < steps; i++) {
+        var t = i / (steps - 1);
+        var pos = t * last;
+        var idx = Math.min(Math.floor(pos), last - 1);
+        var localT = pos - idx;
+        var c = [0, 1, 2].map(function (ch) {
+          return rgbs[idx][ch] + (rgbs[idx + 1][ch] - rgbs[idx][ch]) * localT;
+        });
+        result.push(rgbToHex(c));
+      }
+      return result;
+    }
+    var rootStyle = getComputedStyle(document.documentElement);
+    var paletteAnchors = [
+      rootStyle.getPropertyValue('--gold-strong'),
+      rootStyle.getPropertyValue('--gold'),
+      rootStyle.getPropertyValue('--indigo'),
+      rootStyle.getPropertyValue('--indigo-strong')
+    ];
+    var goldTones = multiStopGradient(paletteAnchors, n);
 
     function polar(r, deg) {
       var rad = (deg - 90) * Math.PI / 180;
