@@ -891,6 +891,61 @@
   .booking-placeholder {
     color: var(--text-soft);
   }
+  .contact-form { margin-top: 24px; }
+  .contact-form .field { margin-bottom: 18px; }
+  .contact-form .field label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    display: block;
+    margin-bottom: 7px;
+  }
+  .contact-form input,
+  .contact-form select,
+  .contact-form textarea {
+    width: 100%;
+    font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 11px 13px;
+    box-sizing: border-box;
+  }
+  .contact-form textarea { resize: vertical; }
+  .contact-form input:focus,
+  .contact-form select:focus,
+  .contact-form textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  .contact-form select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%238A8168' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 13px center;
+  }
+  .contact-form .hp-field {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+  .contact-form .btn-solid { margin-top: 4px; border: none; cursor: pointer; }
+  .contact-form .btn-solid[disabled] { opacity: 0.6; cursor: default; }
+  .form-status {
+    margin: 14px 0 0;
+    font-size: 13.5px;
+    font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  .form-status.is-success { color: var(--gold-strong); }
+  .form-status.is-error { color: #C0553D; }
 
   footer {
     padding: 48px 0 64px;
@@ -1339,9 +1394,43 @@
     <div class="booking-grid">
       <div class="booking-card">
         <h3>Rob Reich</h3>
-        <p>For events, session work, jazz dates, and lessons &mdash; reach out directly.</p>
+        <p>For events, session work, jazz dates, and lessons &mdash; send a note and he'll get right back to you.</p>
+
+        <form class="contact-form" id="contact-form" action="https://formspree.io/f/xdeklyvn" method="POST">
+          <input type="hidden" name="_subject" value="New message from robreichguitar.com">
+          <input type="text" name="_gotcha" class="hp-field" tabindex="-1" autocomplete="off">
+
+          <div class="field">
+            <label for="cf-name">Name</label>
+            <input id="cf-name" type="text" name="name" required>
+          </div>
+
+          <div class="field">
+            <label for="cf-email">Email</label>
+            <input id="cf-email" type="email" name="_replyto" required>
+          </div>
+
+          <div class="field">
+            <label for="cf-reason">What&rsquo;s this about?</label>
+            <select id="cf-reason" name="reason">
+              <option>Event booking</option>
+              <option>Session work</option>
+              <option>Lessons</option>
+              <option>General inquiry</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="cf-message">Message</label>
+            <textarea id="cf-message" name="message" rows="4" required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-solid">Send message</button>
+          <p class="form-status" id="contact-form-status" role="status" aria-live="polite" hidden></p>
+        </form>
+
         <div class="booking-contact">
-          <a href="mailto:robreichguitar@gmail.com">robreichguitar@gmail.com</a>
+          Prefer email? <a href="mailto:robreichguitar@gmail.com">robreichguitar@gmail.com</a>
         </div>
       </div>
     </div>
@@ -1798,6 +1887,51 @@
     });
 
     setActive(0);
+  })();
+
+  // ---------- Booking contact form (Formspree, AJAX) ----------
+  (function () {
+    var form = document.getElementById('contact-form');
+    if (!form) return;
+    var status = document.getElementById('contact-form-status');
+    var submitBtn = form.querySelector('button[type="submit"]');
+
+    function showStatus(message, kind) {
+      status.textContent = message;
+      status.hidden = false;
+      status.classList.remove('is-success', 'is-error');
+      status.classList.add(kind === 'success' ? 'is-success' : 'is-error');
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending…';
+      status.hidden = true;
+
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      }).then(function (response) {
+        if (response.ok) {
+          form.reset();
+          showStatus('Thanks — your message is on its way to Rob.', 'success');
+          submitBtn.textContent = 'Send message';
+        } else {
+          return response.json().then(function (data) {
+            var detail = data && data.errors ? data.errors.map(function (er) { return er.message; }).join(', ') : '';
+            showStatus('Something went wrong' + (detail ? ': ' + detail : '.') + ' Please email robreichguitar@gmail.com directly.', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send message';
+          });
+        }
+      }).catch(function () {
+        showStatus('Something went wrong. Please email robreichguitar@gmail.com directly.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send message';
+      });
+    });
   })();
 </script>
 </body>
