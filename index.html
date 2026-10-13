@@ -865,6 +865,109 @@
     margin-top: 4px;
     letter-spacing: 0.04em;
   }
+  .mode-wedge.is-active path { stroke: var(--text); }
+
+  .mode-player {
+    width: 100%;
+    max-width: 380px;
+    margin: 6px 0 18px;
+  }
+  .mode-player[hidden] { display: none; }
+  .mode-player-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .mode-playpause {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-strong);
+    background: transparent;
+    color: var(--gold-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .mode-playpause svg { width: 15px; height: 15px; }
+  .mode-playpause .icon-pause { display: none; }
+  .mode-player.is-playing .mode-playpause .icon-play { display: none; }
+  .mode-player.is-playing .mode-playpause .icon-pause { display: block; }
+  .mode-time {
+    flex: 0 0 auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--text-soft);
+    min-width: 32px;
+  }
+  .mode-time:last-child { text-align: right; }
+  .mode-progress {
+    --pct: 0%;
+    flex: 1 1 auto;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 3px;
+    border-radius: 2px;
+    background: linear-gradient(to right, var(--gold-strong) var(--pct), var(--line) var(--pct));
+    outline: none;
+    cursor: pointer;
+  }
+  .mode-progress::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--gold-strong);
+    cursor: pointer;
+  }
+  .mode-progress::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border: none;
+    border-radius: 50%;
+    background: var(--gold-strong);
+    cursor: pointer;
+  }
+  .mode-guitar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .mode-guitar-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-right: 4px;
+  }
+  .mode-guitar-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .mode-guitar-btn[aria-pressed="true"] {
+    border-color: var(--gold-strong);
+    background: var(--gold-strong);
+    color: var(--paper);
+  }
+  .mode-caption {
+    margin-top: 12px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--text-soft);
+    text-align: center;
+  }
 
   /* ---------- BOOKING ---------- */
   .booking-grid {
@@ -1353,7 +1456,7 @@
       <div>
         <p class="woodshed-lede">Master the modes. Hear the difference. Understand what creates it. Use it musically.</p>
         <p class="woodshed-lede">Rob Reich and co-creator Doug Glener's Master the Modes takes an ear-first approach to the seven modes, moving beyond fretboard patterns to the sound and musical character of each one. By hearing each mode on its own, you begin to recognize the intervals that give it its particular color &mdash; and how to use that color in real playing.</p>
-        <p class="woodshed-lede">The wheel to the right moves through the modes from brighter to darker musical colors. Click through them, listen for what changes, and explore how each mode creates its own feel.</p>
+        <p class="woodshed-lede">The wheel to the right moves through the modes from brighter to darker musical colors. Click a mode to hear Rob play it &mdash; all seven are in the key of C, so the only thing that changes is the mode itself. Then switch his guitar off and play along.</p>
         <div class="woodshed-note">Lesson format, availability, and rates &mdash; by request. (Placeholder: swap in Rob's actual teaching details here.)</div>
         <div class="hero-ctas" style="margin-top:28px;">
           <a class="btn btn-solid" href="#booking">Ask about lessons</a>
@@ -1363,7 +1466,24 @@
         <svg class="wheel-svg" id="modeWheel" viewBox="0 0 400 400"></svg>
         <div class="wheel-readout" id="wheelReadout">
           <div class="mode-name">&mdash;</div>
-          <div class="mode-formula">Click a wedge to begin</div>
+          <div class="mode-formula">Click a mode to hear it</div>
+        </div>
+        <div class="mode-player" id="modePlayer" hidden>
+          <div class="mode-player-bar">
+            <button type="button" class="mode-playpause" id="modePlayPause" aria-label="Play">
+              <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l12 7-12 7V5z" fill="currentColor"/></svg>
+              <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>
+            </button>
+            <span class="mode-time" id="modeCurrent">0:00</span>
+            <input type="range" class="mode-progress" id="modeProgress" min="0" max="100" value="0" step="0.1" aria-label="Seek">
+            <span class="mode-time" id="modeDuration">0:00</span>
+          </div>
+          <div class="mode-guitar" role="group" aria-label="Rob's guitar">
+            <span class="mode-guitar-label">Rob's guitar</span>
+            <button type="button" class="mode-guitar-btn" data-guitar="on" aria-pressed="true">On</button>
+            <button type="button" class="mode-guitar-btn" data-guitar="off" aria-pressed="false">Off &middot; your turn</button>
+          </div>
+          <p class="mode-caption" id="modeCaption"></p>
         </div>
         <div class="wheel-hint">Ordered brightest (Lydian) to darkest (Locrian)</div>
       </div>
@@ -1566,18 +1686,129 @@
   // ---------- Mode wheel ----------
   (function () {
     var modes = [
-      { name: 'Lydian',     formula: '1  2  3  #4  5  6  7',  feel: 'Major, but the raised 4th makes it float — bright, open, a little unresolved.' },
-      { name: 'Ionian',     formula: '1  2  3  4  5  6  7',   feel: 'The major scale itself. The baseline everything else is measured against.' },
-      { name: 'Mixolydian', formula: '1  2  3  4  5  6  b7',  feel: 'Major with a flatted 7th — the sound under a lot of classic rock and blues-rock.' },
-      { name: 'Dorian',     formula: '1  2  b3  4  5  6  b7', feel: 'Minor with a natural 6th — a minor-key groove that never quite turns sad.' },
-      { name: 'Aeolian',    formula: '1  2  b3  4  5  b6  b7',feel: 'The natural minor scale. Straightforwardly melancholy, no surprises.' },
-      { name: 'Phrygian',   formula: '1  b2  b3  4  5  b6  b7',feel: 'Minor with a flatted 2nd — dark, tense, a half-step away from home.' },
-      { name: 'Locrian',    formula: '1  b2  b3  4  b5  b6  b7',feel: 'Even the 5th is flat. Unstable by design — rarely a home key, mostly a passing color.' }
+      { name: 'Lydian', slug: 'lydian', lag: 0.049,     formula: '1  2  3  #4  5  6  7',  feel: 'Major, but the raised 4th makes it float — bright, open, a little unresolved.' },
+      { name: 'Ionian', slug: 'ionian', lag: 0.052,     formula: '1  2  3  4  5  6  7',   feel: 'The major scale itself. The baseline everything else is measured against.' },
+      { name: 'Mixolydian', slug: 'mixolydian', lag: 0.017, formula: '1  2  3  4  5  6  b7',  feel: 'Major with a flatted 7th — the sound under a lot of classic rock and blues-rock.' },
+      { name: 'Dorian', slug: 'dorian', lag: 0.096,     formula: '1  2  b3  4  5  6  b7', feel: 'Minor with a natural 6th — a minor-key groove that never quite turns sad.' },
+      { name: 'Aeolian', slug: 'aeolian', lag: 0.018,    formula: '1  2  b3  4  5  b6  b7',feel: 'The natural minor scale. Straightforwardly melancholy, no surprises.' },
+      { name: 'Phrygian', slug: 'phrygian', lag: 0.315,   formula: '1  b2  b3  4  5  b6  b7',feel: 'Minor with a flatted 2nd — dark, tense, a half-step away from home.' },
+      { name: 'Locrian', slug: 'locrian', lag: 0.005,    formula: '1  b2  b3  4  b5  b6  b7',feel: 'Even the 5th is flat. Unstable by design — rarely a home key, mostly a passing color.' }
     ];
 
     var svg = document.getElementById('modeWheel');
     var readout = document.getElementById('wheelReadout');
     if (!svg) return;
+
+    // ---- Intro Track player ----
+    // Each mode has two takes of the same Intro Track (from Master the Modes):
+    // with Rob's guitar and without it. Both play together and the guitar
+    // switch just changes which one is muted. `lag` is how many seconds the
+    // "with" take runs behind the "without" take (measured from the audio).
+    var modePlayer = document.getElementById('modePlayer');
+    var playPauseBtn = document.getElementById('modePlayPause');
+    var progress = document.getElementById('modeProgress');
+    var curEl = document.getElementById('modeCurrent');
+    var durEl = document.getElementById('modeDuration');
+    var caption = document.getElementById('modeCaption');
+    var guitarBtns = Array.prototype.slice.call(modePlayer.querySelectorAll('.mode-guitar-btn'));
+    var recordingsAudio = document.getElementById('playerAudio');
+    var withTake = new Audio();
+    var withoutTake = new Audio();
+    withTake.preload = withoutTake.preload = 'auto';
+    var current = null;
+    var guitarOn = true;
+
+    function fmt(sec) {
+      if (!isFinite(sec) || isNaN(sec)) return '0:00';
+      sec = Math.max(0, Math.floor(sec));
+      return Math.floor(sec / 60) + ':' + (sec % 60 < 10 ? '0' : '') + (sec % 60);
+    }
+    function applyMute() {
+      withTake.muted = !guitarOn;
+      withoutTake.muted = guitarOn;
+      guitarBtns.forEach(function (b) {
+        b.setAttribute('aria-pressed', String((b.getAttribute('data-guitar') === 'on') === guitarOn));
+      });
+    }
+    // Keep the muted take lined up with the audible one, so switching is seamless.
+    function resync() {
+      if (!current) return;
+      if (guitarOn) {
+        var want = withTake.currentTime - current.lag;
+        if (Math.abs(withoutTake.currentTime - want) > 0.05) withoutTake.currentTime = Math.max(0, want);
+      } else {
+        var wantWith = withoutTake.currentTime + current.lag;
+        if (Math.abs(withTake.currentTime - wantWith) > 0.05) withTake.currentTime = wantWith;
+      }
+    }
+    function play() {
+      if (recordingsAudio) recordingsAudio.pause();
+      resync();
+      withTake.play().catch(function () {});
+      withoutTake.play().catch(function () {});
+    }
+    function pause() {
+      withTake.pause();
+      withoutTake.pause();
+    }
+    function setPlayingUI(on) {
+      modePlayer.classList.toggle('is-playing', on);
+      playPauseBtn.setAttribute('aria-label', on ? 'Pause' : 'Play');
+    }
+    withTake.addEventListener('playing', function () { setPlayingUI(true); });
+    withTake.addEventListener('pause', function () { setPlayingUI(false); });
+    function load(m) {
+      pause();
+      current = m;
+      withTake.src = 'modes/intro-' + m.slug + '-with.mp3';
+      withoutTake.src = 'modes/intro-' + m.slug + '-without.mp3';
+      withTake.currentTime = m.lag;
+      withoutTake.currentTime = 0;
+      curEl.textContent = '0:00';
+      durEl.textContent = '0:00';
+      progress.style.setProperty('--pct', '0%');
+      progress.value = 0;
+      caption.textContent = 'C ' + m.name + ' \u2014 Rob plays the mode over a simple vamp. ' +
+        'Switch his guitar off and it\u2019s your turn.';
+      applyMute();
+      modePlayer.hidden = false;
+      play();
+    }
+
+    playPauseBtn.addEventListener('click', function () {
+      if (withTake.paused) play(); else pause();
+    });
+    guitarBtns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        resync();
+        guitarOn = b.getAttribute('data-guitar') === 'on';
+        applyMute();
+      });
+    });
+    withTake.addEventListener('loadedmetadata', function () { durEl.textContent = fmt(withTake.duration); });
+    withTake.addEventListener('timeupdate', function () {
+      curEl.textContent = fmt(withTake.currentTime);
+      if (withTake.duration) {
+        var pct = (withTake.currentTime / withTake.duration) * 100;
+        progress.value = pct;
+        progress.style.setProperty('--pct', pct + '%');
+      }
+      if (!withTake.paused) resync();
+    });
+    withTake.addEventListener('ended', function () {
+      pause();
+      withTake.currentTime = current.lag;
+      withoutTake.currentTime = 0;
+    });
+    progress.addEventListener('input', function () {
+      if (!withTake.duration) return;
+      var t = (progress.value / 100) * withTake.duration;
+      withTake.currentTime = t;
+      withoutTake.currentTime = Math.max(0, t - current.lag);
+      progress.style.setProperty('--pct', progress.value + '%');
+    });
+    if (recordingsAudio) recordingsAudio.addEventListener('play', pause);
+    var wedges = [];
 
     var cx = 200, cy = 200, rOuter = 176, rInner = 64;
     var n = modes.length;
@@ -1661,7 +1892,10 @@
       label.textContent = m.name;
       g.appendChild(label);
 
+      wedges.push(g);
       function activate() {
+        wedges.forEach(function (w) { w.classList.toggle('is-active', w === g); });
+        load(m);
         readout.innerHTML =
           '<div class="mode-name">' + m.name + '</div>' +
           '<div class="mode-formula">' + m.formula + '</div>' +

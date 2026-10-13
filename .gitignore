@@ -13,7 +13,8 @@ Sublime Text Info for Rob/
 .source-assets/
 
 # Audio files and the PDF — not embedded or linked anywhere in index.html,
-# except the tracks actually used in the Recordings section
+# except the tracks actually used in the Recordings and Woodshed sections
 *.mp3
 !recordings/*.mp3
+!modes/*.mp3
 *.pdf
