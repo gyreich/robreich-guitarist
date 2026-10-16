@@ -24,6 +24,8 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.utils import simpleSplit
 from reportlab.pdfgen import canvas
 
+from guide_links import add_links
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 OUT = os.path.join(HERE, "Master the Modes")
@@ -184,6 +186,8 @@ def build_guide(dst, tmp):
     for p in orig.pages[1:]:
         w.add_page(p)
     w.add_page(PyPDF2.PdfReader(close).pages[0])                # Keep Going with Rob
+    # clickable audio mentions (Start Here sits after the cover, shifting later pages by one)
+    add_links(w, os.path.join(ROOT, "Master the Modes.pdf"), lambda p: 0 if p == 1 else p)
     w.add_metadata({"/Title": "Master the Modes", "/Author": "Rob Reich & Doug Glener"})
     with open(dst, "wb") as f:
         w.write(f)
