@@ -22,6 +22,8 @@ import PyPDF2
 from reportlab.lib.colors import HexColor
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.utils import simpleSplit
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
 from guide_links import add_links
@@ -46,6 +48,12 @@ SOURCE_OVERRIDES = {  # source files whose names don't follow the pattern
     "Manhattan Reggae (Lydian with guitar).mp3": "Manhattan Reggae (Lydian with guitar) 2.mp3",
 }
 
+# Gill Sans, to match the original guide (macOS's copy allows preview & print embedding)
+GILL = "/System/Library/Fonts/Supplemental/GillSans.ttc"
+pdfmetrics.registerFont(TTFont("GillSans", GILL, subfontIndex=0))
+pdfmetrics.registerFont(TTFont("GillSans-Bold", GILL, subfontIndex=1))
+pdfmetrics.registerFont(TTFont("GillSans-SemiBold", GILL, subfontIndex=4))
+
 INK = HexColor("#1C1C1C")
 SOFT = HexColor("#555555")
 GOLD = HexColor("#B07A2A")
@@ -60,7 +68,7 @@ def tag_copy(src, dst, title, track, total):
                     "-metadata", f"track={track}/{total}", "-id3v2_version", "3", dst], check=True)
 
 
-def text_block(c, x, y, lines, size=12, leading=17, color=INK, font="Helvetica"):
+def text_block(c, x, y, lines, size=12, leading=17, color=INK, font="GillSans"):
     c.setFont(font, size)
     c.setFillColor(color)
     for ln in lines:
@@ -69,110 +77,128 @@ def text_block(c, x, y, lines, size=12, leading=17, color=INK, font="Helvetica")
     return y
 
 
-def paragraph(c, x, y, text, width, size=12, leading=16, color=INK, font="Helvetica"):
+def paragraph(c, x, y, text, width, size=12, leading=16, color=INK, font="GillSans"):
     """Word-wrapped paragraph; returns the y below it."""
     return text_block(c, x, y, simpleSplit(text, font, size, width), size, leading, color, font)
 
 
 def link(c, x, y, label, url, size=12):
-    c.setFont("Helvetica-Bold", size)
+    c.setFont("GillSans-Bold", size)
     c.setFillColor(GOLD)
     c.drawString(x, y, label)
-    w = c.stringWidth(label, "Helvetica-Bold", size)
+    w = c.stringWidth(label, "GillSans-Bold", size)
     c.linkURL(url, (x, y - 3, x + w, y + size), relative=0)
 
 
-def heading(c, y, title):
-    c.setFont("Helvetica-Bold", 26)
-    c.setFillColor(INK)
-    c.drawString(72, y, title)
-    c.setStrokeColor(GOLD)
-    c.setLineWidth(1.5)
-    c.line(72, y - 12, 160, y - 12)
+# Layout matching the original guide: Gill Sans, ~0.55in margins, 14pt body
+LEFT, RIGHT = 40, W - 40
+BODY, LEAD = 14, 19.5
+
+
+class Page:
+    """Top-down writer for one letter page; refuses to run off the bottom."""
+
+    def __init__(self, path, title):
+        self.c = canvas.Canvas(path, pagesize=letter)
+        self.c.setFillColor(INK)
+        self.c.setFont("GillSans-SemiBold", 24)
+        self.c.drawString(LEFT, H - 70, title)
+        self.c.setStrokeColor(GOLD)
+        self.c.setLineWidth(1.5)
+        self.c.line(LEFT, H - 82, LEFT + 90, H - 82)
+        self.y = H - 116
+
+    def _room(self, need):
+        if self.y - need < 46:
+            raise ValueError("page content runs off the bottom; shorten the text")
+
+    def gap(self, pts):
+        self.y -= pts
+
+    def subhead(self, text):
+        self.gap(8)
+        self._room(24)
+        self.c.setFont("GillSans-Bold", 16); self.c.setFillColor(INK)
+        self.c.drawString(LEFT, self.y, text)
+        self.y -= 23
+
+    def para(self, text, x=LEFT, size=BODY, lead=LEAD, color=INK, font="GillSans", after=6):
+        lines = simpleSplit(text, font, size, RIGHT - x)
+        self._room(lead * len(lines))
+        self.y = text_block(self.c, x, self.y, lines, size, lead, color, font) - after
+
+    def row(self, label, text, label_w=170):
+        """Bold label with a wrapped description beside it."""
+        lines = simpleSplit(text, "GillSans", BODY, RIGHT - LEFT - label_w)
+        self._room(LEAD * len(lines))
+        self.c.setFont("GillSans-Bold", BODY); self.c.setFillColor(INK)
+        self.c.drawString(LEFT, self.y, label)
+        self.y = text_block(self.c, LEFT + label_w, self.y, lines, BODY, LEAD) - 4
+
+    def numbered(self, k, text):
+        self.c.setFont("GillSans-Bold", BODY); self.c.setFillColor(GOLD)
+        self.c.drawString(LEFT, self.y, f"{k}.")
+        self.para(text, x=LEFT + 20, after=5)
+
+    def link_line(self, label, shown, url):
+        self._room(48)
+        self.c.setFont("GillSans-Bold", BODY); self.c.setFillColor(INK)
+        self.c.drawString(LEFT, self.y, label)
+        link(self.c, LEFT, self.y - 20, shown, url, size=BODY)
+        self.y -= 52
+
+    def save(self):
+        self.c.showPage()
+        self.c.save()
 
 
 def start_here_page(path):
-    c = canvas.Canvas(path, pagesize=letter)
-    heading(c, H - 96, "Start Here")
-    y = text_block(c, 72, H - 140, [
-        "Welcome to Master the Modes, the ear-first course by Rob Reich and Doug Glener.",
-        "Everything is in the key of C, so you hear what each mode itself sounds like.",
-    ], size=12.5)
-    y -= 14
-    c.setFont("Helvetica-Bold", 14); c.setFillColor(INK); c.drawString(72, y, "What's in your folder"); y -= 24
-    items = [
-        ("This guide", "the modes explained, one page each, plus practice tips."),
-        ("Master Class with Rob", "a one-hour audio lesson that walks through the whole idea."),
-        ("1 Intro Trax", "a short, simple track for each mode. \"w-gtr\" has Rob playing;"),
-        ("", "\"w-out gtr\" is the same track without him, for you to play over."),
-        ("2 Jam Traxs", "a full tune for each mode in a real style (funk, reggae, rock,"),
-        ("", "fusion), again with and without Rob's guitar."),
-    ]
-    for name, desc in items:
-        if name:
-            c.setFont("Helvetica-Bold", 12); c.setFillColor(INK); c.drawString(84, y, name)
-        c.setFont("Helvetica", 12); c.setFillColor(SOFT); c.drawString(250, y, desc)
-        y -= 18
-    y -= 14
-    c.setFont("Helvetica-Bold", 14); c.setFillColor(INK); c.drawString(72, y, "How to use it"); y -= 24
-    steps = [
-        ["Listen to the start of the Master Class. In the first few minutes Rob plays all",
-         "seven modes from C, and you hear how different they are."],
-        ["Work through the modes in this guide's order. For each one, read its page, listen",
-         "to Rob on the Intro Trax (w-gtr), then play along with the w-out gtr version."],
-        ["When a mode feels comfortable, move on to its Jam Trax: hear what Rob does",
-         "with it, then take your own solo over the version without guitar."],
-    ]
-    for k, lines in enumerate(steps, 1):
-        c.setFont("Helvetica-Bold", 12); c.setFillColor(GOLD); c.drawString(84, y, f"{k}.")
-        y = text_block(c, 104, y, lines, size=12, leading=16) - 8
-    y -= 6
-    c.setFont("Helvetica-Bold", 14); c.setFillColor(INK)
-    c.drawString(72, y, "Why the modes are in this order"); y -= 22
-    y = paragraph(c, 72, y,
-        "The lessons and tracks follow a learning order. Start with the major scale (Ionian). "
-        "Dorian flattens its 3rd and 7th, and each minor mode after that flattens one more note: "
-        "Aeolian adds a flat 6th, Phrygian a flat 2nd, Locrian a flat 5th. Each step darkens the "
-        "sound, so you hear exactly what one altered note does. Lydian (sharp 4th) and Mixolydian "
-        "(flat 7th) each change just one note of the major scale.", W - 144) - 6
-    y = paragraph(c, 72, y,
-        "The charts and the Master Class use the traditional order: Ionian, Dorian, Phrygian, "
-        "Lydian, Mixolydian, Aeolian, Locrian.", W - 144) - 12
-    y = paragraph(c, 72, y,
-        "The tracks are named the way this guide refers to them: \"Dorian w/gtr\" in the text "
-        "is the file \"Dorian w-gtr\".", W - 144, size=11, leading=15, color=SOFT) - 14
-    c.setFont("Helvetica", 12); c.setFillColor(INK)
-    c.drawString(72, y, "Try the interactive mode wheel, with Rob's guitar on or off, at")
-    link(c, 72, y - 18, "robreichguitar.com", SITE + "/#woodshed")
-    c.showPage(); c.save()
+    pg = Page(path, "Start Here")
+    pg.para("Welcome to Master the Modes, the ear-first course by Rob Reich and Doug Glener. "
+            "Everything is in the key of C, so you hear what each mode itself sounds like.")
+    pg.subhead("What's in your folder")
+    pg.row("This guide", "the modes explained, one page each, plus practice tips.")
+    pg.row("Master Class with Rob", "a one-hour audio lesson that walks through the whole idea.")
+    pg.row("1 Intro Trax", "a short, simple track for each mode. \"w-gtr\" has Rob playing; "
+                           "\"w-out gtr\" is the same track without him, for you to play over.")
+    pg.row("2 Jam Traxs", "a full tune for each mode in a real style (funk, reggae, rock, "
+                          "fusion), again with and without Rob's guitar.")
+    pg.subhead("How to use it")
+    pg.numbered(1, "Listen to the start of the Master Class. In the first few minutes Rob plays "
+                   "all seven modes from C, and you hear how different they are.")
+    pg.numbered(2, "Work through the modes in this guide's order. For each one, read its page, "
+                   "listen to Rob on the Intro Trax (w-gtr), then play along with the w-out gtr version.")
+    pg.numbered(3, "When a mode feels comfortable, move on to its Jam Trax: hear what Rob does "
+                   "with it, then take your own solo over the version without guitar.")
+    pg.subhead("Why the modes are in this order")
+    pg.para("The lessons and tracks follow a learning order. Start with the major scale (Ionian). "
+            "Dorian flattens its 3rd and 7th, and each minor mode after that flattens one more note: "
+            "Aeolian adds a flat 6th, Phrygian a flat 2nd, Locrian a flat 5th. Each step darkens the "
+            "sound, so you hear exactly what one altered note does. Lydian (sharp 4th) and Mixolydian "
+            "(flat 7th) each change just one note of the major scale.")
+    pg.para("The charts and the Master Class use the traditional order: Ionian, Dorian, Phrygian, "
+            "Lydian, Mixolydian, Aeolian, Locrian.", after=10)
+    pg.para("Tap any underlined track name or speaker icon to play it. In the text, \"Dorian w/gtr\" "
+            "is the file \"Dorian w-gtr\".", size=12, lead=16, color=SOFT, after=10)
+    pg.para("Try the interactive mode wheel, with Rob's guitar on or off, at", after=2)
+    link(pg.c, LEFT, pg.y, "robreichguitar.com", SITE + "/#woodshed", size=BODY)
+    pg.save()
 
 
 def closing_page(path):
-    c = canvas.Canvas(path, pagesize=letter)
-    heading(c, H - 96, "Keep Going with Rob")
-    y = text_block(c, 72, H - 140, [
-        "Rob Reich is a jazz fusion guitarist and composer in the New York area. He teaches",
-        "privately, and he played every solo on these tracks live, in one take.",
-    ], size=12.5)
-    y -= 20
-    rows = [
-        ("Lessons, gigs and booking", "robreichguitar.com", SITE),
-        ("The mode wheel (play along online)", "robreichguitar.com/#woodshed", SITE + "/#woodshed"),
-        ("Videos, including the modes challenge series", "youtube.com/@RobReichGuitar", YOUTUBE),
-    ]
-    for label, shown, url in rows:
-        c.setFont("Helvetica-Bold", 12); c.setFillColor(INK); c.drawString(72, y, label)
-        link(c, 72, y - 18, shown, url)
-        y -= 50
-    y -= 6
-    text_block(c, 72, y, [
-        "You're receiving this because you signed up at robreichguitar.com. Rob sends an",
-        "occasional email about new videos, gigs and lesson openings; you can unsubscribe",
-        "from any of them in one click.",
-    ], size=11, leading=15, color=SOFT)
-    c.setFont("Helvetica", 10); c.setFillColor(SOFT)
-    c.drawString(72, 72, "Master the Modes by Rob Reich & Doug Glener.")
-    c.showPage(); c.save()
+    pg = Page(path, "Keep Going with Rob")
+    pg.para("Rob Reich is a jazz fusion guitarist and composer in the New York area. He teaches "
+            "privately, and he played every solo on these tracks live, in one take.", after=18)
+    pg.link_line("Lessons, gigs and booking", "robreichguitar.com", SITE)
+    pg.link_line("The mode wheel (play along online)", "robreichguitar.com/#woodshed", SITE + "/#woodshed")
+    pg.link_line("Videos, including the modes challenge series", "youtube.com/@RobReichGuitar", YOUTUBE)
+    pg.gap(6)
+    pg.para("You're receiving this because you signed up at robreichguitar.com. Rob sends an "
+            "occasional email about new videos, gigs and lesson openings; you can unsubscribe "
+            "from any of them in one click.", size=12, lead=16, color=SOFT)
+    pg.c.setFont("GillSans", 11); pg.c.setFillColor(SOFT)
+    pg.c.drawString(LEFT, 52, "Master the Modes by Rob Reich & Doug Glener.")
+    pg.save()
 
 
 def build_guide(dst, tmp):
