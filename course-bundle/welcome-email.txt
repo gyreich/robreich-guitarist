@@ -1,0 +1,46 @@
+KIT FORM SETUP TEXT -- copy each piece into the matching place in Kit
+
+==========================================================================
+1. THE FORM (on the website, under the mode wheel)
+==========================================================================
+Heading:      Get the complete Master the Modes course, free
+Line:         The guide, the one-hour Master Class, and 14 play-along tracks
+              with and without Rob's guitar.
+Email field placeholder:  Your email address
+Button:       Send me the course
+Small print:  Rob will email you about the course, new videos and gigs.
+              Unsubscribe anytime.
+
+Success message (shown on the site after someone clicks the button):
+              Almost there! Check your email and click the button to get the course.
+
+==========================================================================
+2. THE INCENTIVE EMAIL (Kit sends it right away; its button confirms the
+   address and opens the course)
+==========================================================================
+Subject:      Confirm to get your free Master the Modes course
+
+Body:
+Hi there,
+
+Thanks for signing up! Click the button below and your complete Master the
+Modes course opens: the guide, the one-hour Master Class, and 14 play-along
+tracks, each with and without my guitar.
+
+My suggestion: listen to the first few minutes of the Master Class tonight.
+I play all seven modes from the same note, and you'll hear right away how
+different they are. Then start with the "Start Here" page in the guide.
+
+You can also play along in your browser on the mode wheel at
+robreichguitar.com
+
+I'll write now and then about new videos, gigs and lesson openings. If you
+ever want lessons, just reply to any of my emails.
+
+Enjoy,
+Rob
+
+Button text:  Yes, send me the course
+
+After the button is clicked, send them to (redirect URL):
+              [the Google Drive folder link]

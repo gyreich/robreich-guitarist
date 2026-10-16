@@ -22,3 +22,9 @@ Sublime Text Info for Rob/
 # Free course bundle (built by course-bundle/build_bundle.py; shared via Google Drive, not the site)
 course-bundle/Master the Modes/
 course-bundle/*.zip
+
+# Rendered videos and caches from video-templates/ (re-creatable from the scripts; backed up outside git)
+video-templates/__pycache__/
+video-templates/barbara-shorts/
+video-templates/dream-dancing-shorts/
+video-templates/modes-video/
