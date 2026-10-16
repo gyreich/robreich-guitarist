@@ -18,3 +18,7 @@ Sublime Text Info for Rob/
 !recordings/*.mp3
 !modes/*.mp3
 *.pdf
+
+# Free course bundle (built by course-bundle/build_bundle.py; shared via Google Drive, not the site)
+course-bundle/Master the Modes/
+course-bundle/*.zip

@@ -872,6 +872,50 @@
   }
   .mode-wedge.is-active path { stroke: var(--text); }
 
+  .course-signup {
+    margin-top: 56px;
+    padding: 28px 32px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--gold-strong);
+    border-radius: var(--radius);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 48px;
+    align-items: center;
+  }
+  @media (max-width: 860px) { .course-signup { grid-template-columns: 1fr; padding: 24px 20px; } }
+  .course-signup h3 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 1.25;
+    margin: 0 0 8px;
+    color: var(--text);
+  }
+  .course-signup-copy p { margin: 0; font-size: 15px; color: var(--text-soft); }
+  .course-form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .course-form input[type="email"] {
+    flex: 1 1 220px;
+    min-width: 0;
+    font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+  }
+  .course-form input[type="email"]:focus { outline: none; border-color: var(--gold); }
+  .course-form .btn-solid { border: none; cursor: pointer; justify-content: center; }
+  .course-form .btn-solid[disabled] { opacity: 0.6; cursor: default; }
+  .course-form-note {
+    margin: 10px 0 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--text-soft);
+  }
+
   .mode-player {
     width: 100%;
     max-width: 380px;
@@ -1492,6 +1536,21 @@
         </div>
         <div class="wheel-hint">Ordered brightest (Lydian) to darkest (Locrian)</div>
       </div>
+    </div>
+    <div class="course-signup" id="course-signup">
+      <div class="course-signup-copy">
+        <h3>Get the complete Master the Modes course, free</h3>
+        <p>The guide, the one-hour Master Class, and 14 play-along tracks with and without Rob&rsquo;s guitar.</p>
+      </div>
+      <form class="course-form" id="course-form" action="https://app.kit.com/forms/10052674/subscriptions" method="POST">
+        <label class="sr-only" for="course-email">Email address</label>
+        <div class="course-form-row">
+          <input id="course-email" type="email" name="email_address" placeholder="Your email address" autocomplete="email" required>
+          <button type="submit" class="btn btn-solid">Send me the course</button>
+        </div>
+        <p class="course-form-note">Rob will email you about the course, new videos and gigs. Unsubscribe anytime.</p>
+        <p class="form-status" id="course-form-status" role="status" aria-live="polite" hidden></p>
+      </form>
     </div>
     <dl class="sr-only">
       <dt>Lydian</dt>
@@ -2182,6 +2241,47 @@
         submitBtn.disabled = false;
         submitBtn.textContent = 'Send message';
       });
+    });
+  })();
+
+  // ---------- Free course signup (Kit form 10052674, AJAX) ----------
+  // Kit sends the confirmation ("incentive") email; its button delivers the course.
+  (function () {
+    var form = document.getElementById('course-form');
+    if (!form) return;
+    var status = document.getElementById('course-form-status');
+    var btn = form.querySelector('button[type="submit"]');
+    var label = btn.textContent;
+
+    function show(message, kind) {
+      status.textContent = message;
+      status.hidden = false;
+      status.classList.remove('is-success', 'is-error');
+      status.classList.add(kind === 'success' ? 'is-success' : 'is-error');
+    }
+    function fail() {
+      show('Something went wrong. Please try again, or email robreichguitar@gmail.com.', 'error');
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      status.hidden = true;
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      }).then(function (response) {
+        return response.json().catch(function () { return {}; }).then(function (data) {
+          if (!response.ok || data.status === 'failed') return fail();
+          form.reset();
+          btn.textContent = label;
+          show('Almost there! Check your email and click the button to get the course.', 'success');
+        });
+      }).catch(fail);
     });
   })();
 </script>
