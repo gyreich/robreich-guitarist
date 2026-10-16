@@ -54,6 +54,10 @@ pdfmetrics.registerFont(TTFont("GillSans", GILL, subfontIndex=0))
 pdfmetrics.registerFont(TTFont("GillSans-Bold", GILL, subfontIndex=1))
 pdfmetrics.registerFont(TTFont("GillSans-SemiBold", GILL, subfontIndex=4))
 
+COPYRIGHT = "\u00a9 2010\u20132026 Rob Reich & Doug Glener. All rights reserved."
+TERMS = ("This course is free for your personal use. Please don't sell, repost or "
+         "redistribute it; share the signup link instead: robreichguitar.com")
+
 INK = HexColor("#1C1C1C")
 SOFT = HexColor("#555555")
 GOLD = HexColor("#B07A2A")
@@ -65,7 +69,9 @@ def tag_copy(src, dst, title, track, total):
                     "-map", "0:a", "-c", "copy", "-map_metadata", "-1",
                     "-metadata", f"title={title}", "-metadata", f"artist={ARTIST}",
                     "-metadata", f"album_artist={ARTIST}", "-metadata", f"album={ALBUM}",
-                    "-metadata", f"track={track}/{total}", "-id3v2_version", "3", dst], check=True)
+                    "-metadata", f"track={track}/{total}",
+                    "-metadata", f"copyright={COPYRIGHT}", "-metadata", f"comment={TERMS}",
+                    "-id3v2_version", "3", dst], check=True)
 
 
 def text_block(c, x, y, lines, size=12, leading=17, color=INK, font="GillSans"):
@@ -182,6 +188,8 @@ def start_here_page(path):
             "is the file \"Dorian w-gtr\".", size=12, lead=16, color=SOFT, after=10)
     pg.para("Try the interactive mode wheel, with Rob's guitar on or off, at", after=2)
     link(pg.c, LEFT, pg.y, "robreichguitar.com", SITE + "/#woodshed", size=BODY)
+    pg.c.setFont("GillSans", 9.5); pg.c.setFillColor(SOFT)
+    pg.c.drawString(LEFT, 26, COPYRIGHT + " Free for personal use; not for resale or redistribution.")
     pg.save()
 
 
@@ -196,8 +204,10 @@ def closing_page(path):
     pg.para("You're receiving this because you signed up at robreichguitar.com. Rob sends an "
             "occasional email about new videos, gigs and lesson openings; you can unsubscribe "
             "from any of them in one click.", size=12, lead=16, color=SOFT)
-    pg.c.setFont("GillSans", 11); pg.c.setFillColor(SOFT)
-    pg.c.drawString(LEFT, 52, "Master the Modes by Rob Reich & Doug Glener.")
+    foot = simpleSplit(TERMS, "GillSans", 11, RIGHT - LEFT)
+    pg.c.setFont("GillSans-Bold", 11); pg.c.setFillColor(INK)
+    pg.c.drawString(LEFT, 52 + 15 * len(foot), COPYRIGHT)
+    text_block(pg.c, LEFT, 52 + 15 * (len(foot) - 1), foot, 11, 15, SOFT)
     pg.save()
 
 
@@ -214,7 +224,8 @@ def build_guide(dst, tmp):
     w.add_page(PyPDF2.PdfReader(close).pages[0])                # Keep Going with Rob
     # clickable audio mentions (Start Here sits after the cover, shifting later pages by one)
     add_links(w, os.path.join(ROOT, "Master the Modes.pdf"), lambda p: 0 if p == 1 else p)
-    w.add_metadata({"/Title": "Master the Modes", "/Author": "Rob Reich & Doug Glener"})
+    w.add_metadata({"/Title": "Master the Modes", "/Author": "Rob Reich & Doug Glener",
+                    "/Subject": f"{COPYRIGHT} {TERMS}", "/Copyright": COPYRIGHT})
     with open(dst, "wb") as f:
         w.write(f)
 
