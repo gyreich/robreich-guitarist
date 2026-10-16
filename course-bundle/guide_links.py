@@ -77,9 +77,41 @@ def _lines(pdf_path):
     return out
 
 
+def _speaker_icons(pdf_path):
+    """{page: [(x0, y0, x1, y1)]} for the ~26pt speaker icons beside "Listen to ..." lines."""
+    from pdfminer.layout import LTImage
+
+    def walk(o):
+        yield o
+        if hasattr(o, "__iter__"):
+            for c in o:
+                yield from walk(c)
+
+    out = {}
+    for pno, page in enumerate(extract_pages(pdf_path), 1):
+        boxes = {(round(o.x0), round(o.y0), round(o.x1), round(o.y1))
+                 for el in page for o in walk(el)
+                 if isinstance(o, LTImage) and 22 <= o.x1 - o.x0 <= 32 and 22 <= o.y1 - o.y0 <= 32}
+        if boxes:
+            out[pno] = sorted(boxes)
+    return out
+
+
+def _with_icon(rect, icons):
+    """Grow a mention's link leftward over the speaker icon on its line, so clicking
+    the icon (or "Listen to") plays the same track."""
+    x0, y0, x1, y1 = rect
+    for ix0, iy0, ix1, iy1 in icons:
+        overlap = min(y1, iy1) - max(y0, iy0)
+        if overlap > 0.5 * (y1 - y0) and 0 <= x0 - ix1 < 120:
+            return (ix0 - 2, min(y0, iy0 - 1), x1, max(y1, iy1 + 1))
+    return rect
+
+
 def locate(pdf_path):
     """[(original page, (x0, y0, x1, y1), key, words)] for every mention."""
     lines = _lines(pdf_path)
+    icons = _speaker_icons(pdf_path)
     found = []
     for page, y, words, key in MENTIONS:
         hit = None
@@ -96,7 +128,7 @@ def locate(pdf_path):
                 break
         if not hit:
             raise ValueError(f"guide page {page}: couldn't find {words!r} near y={y}")
-        found.append((page, hit, key, words))
+        found.append((page, _with_icon(hit, icons.get(page, [])), key, words))
     return found
 
 
