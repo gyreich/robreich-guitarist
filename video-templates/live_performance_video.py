@@ -23,6 +23,13 @@ W, H, FPS = 1920, 1080, 30
 END_LEN = 15.0
 
 PERFORMANCES = {
+    "dream-dancing-part1": {
+        "src": "Rob Reich, Eliot Zigmund and Rene Hart playing Dream Dancin (Part 1).mp4",
+        "song": "Dream Dancing",
+        "kicker": "ROB REICH TRIO  ·  COLE PORTER  ·  LIVE",
+        "players": "ROB REICH guitar   ·   ELIOT ZIGMUND drums   ·   RENE HART bass",
+        "end_note": "CONTINUED IN PART 2",
+    },
     "dream-dancing-part2": {
         "src": "Rob Reich, Eliot Zigmund, Rene Hart.MOV Dream Dancing pt 2 (1).mp4",
         "song": "Dream Dancing",
@@ -61,9 +68,11 @@ def corner_credit(path):
     im.save(path)
 
 
-def end_card(path):
+def end_card(path, note=None):
     im = vignette(dark_canvas(W, H), strength=0.4)
     d = ImageDraw.Draw(im)
+    if note:   # e.g. "CONTINUED IN PART 2", pairs with the end screen's video element
+        draw_tracked(d, 520, 790, note, mono(30, True), GOLD, 4)
     cx = 520
     draw_tracked(d, cx, 300, "ROB REICH", fraunces(96, 700), TEXT, 8)
     d.rectangle((cx - 90, 432, cx + 90, 434), fill=GOLD)
@@ -92,7 +101,7 @@ def build(key):
     lt, cc, ec = (os.path.join(tmp, f"{key}-{n}.png") for n in ("lower", "corner", "end"))
     lower_third(lt, p["song"], p["kicker"], p["players"])
     corner_credit(cc)
-    end_card(ec)
+    end_card(ec, p.get("end_note"))
 
     src = os.path.join(ROOT, p["src"])
     dur = duration(src)
