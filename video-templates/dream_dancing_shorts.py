@@ -103,7 +103,7 @@ def hook_card(path, cy, line1, line2):
     im.save(path)
 
 
-def render(name, start, dur, crop, box, credits_y, stacked, hook=None, tagline=None):
+def render(name, start, dur, crop, box, credits_y, stacked, hook=None, tagline=None, src=SRC):
     """hook: (line1, line2) card shown over the video for the first 4s."""
     bg = os.path.join(OUT, f".{name}_bg.png")
     hk = os.path.join(OUT, f".{name}_hook.png")
@@ -118,7 +118,7 @@ def render(name, start, dur, crop, box, credits_y, stacked, hook=None, tagline=N
           f"[1:v][v]overlay={x0}:{y0}[c];"
           f"[2:v]format=rgba,fade=t=in:st=0.3:d=0.4:alpha=1,fade=t=out:st=3.8:d=0.5:alpha=1[h];"
           f"[c][h]overlay=0:0:enable='lt(t,4.4)',{vf}[out];[0:a]{af}[a]")
-    run(["-ss", str(start), "-t", str(dur), "-i", SRC,
+    run(["-ss", str(start), "-t", str(dur), "-i", src,
          "-loop", "1", "-t", str(dur), "-i", bg,
          "-loop", "1", "-t", str(dur), "-i", hk,
          "-filter_complex", fc, "-map", "[out]", "-map", "[a]", "-t", str(dur)]
@@ -131,7 +131,25 @@ CROP_ROB = "crop=576:720:60:0,"
 BOX_ROB = (60, 420, 1020, 1620)          # 960x1200, 4:5
 BOX_WIDE = (40, 640, 1040, 1203)         # 1000x563, 16:9
 
+SRC_PART1 = os.path.join(ROOT, "Rob Reich, Eliot Zigmund and Rene Hart playing Dream Dancin (Part 1).mp4")
+
+
+def part1_shorts():
+    render("dd_p1_peak", 64, 26, CROP_ROB, BOX_ROB, 1665, False,
+           ("Jazz guitar, live", "ROB REICH TRIO \u00b7 DREAM DANCING"), src=SRC_PART1)
+    render("dd_p1_trio", 94, 26, "", BOX_WIDE, 1313, True,
+           tagline="Rob Reich \u00b7 Eliot Zigmund \u00b7 Rene Hart", src=SRC_PART1)
+
+
 if __name__ == "__main__":
+    import sys
+    if "part1" in sys.argv:
+        os.makedirs(OUT, exist_ok=True)
+        part1_shorts()
+        for f in os.listdir(OUT):
+            if f.startswith("."):
+                os.remove(os.path.join(OUT, f))
+        sys.exit()
     os.makedirs(OUT, exist_ok=True)
     render("dd_1_peak", 68, 26, CROP_ROB, BOX_ROB, 1665, False,
            ("Rob Reich – live", "WITH ELIOT ZIGMUND & RENE HART"))
