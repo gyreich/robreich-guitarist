@@ -494,6 +494,30 @@
     display: flex;
     justify-content: center;
   }
+  .featured-solos { margin-top: 64px; }
+  .featured-solos-sub {
+    margin: 6px 0 0;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 18px;
+    color: #DCD2BC;
+  }
+  .solo-buttons { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px; }
+  /* looks like .playlist-tab, but a separate class so the playlist tab script ignores it */
+  .solo-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #C9BFA9;
+    background: transparent;
+    border: 1px solid rgba(237,230,214,0.24);
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  }
+  .solo-btn:hover, .solo-btn:focus-visible { color: #F3ECDC; border-color: rgba(237,230,214,0.5); }
+  .solo-btn.is-active { background: var(--gold); border-color: var(--gold); color: #1B160F; }
   .playlist-view-link {
     display: inline-flex;
     align-items: center;
@@ -1194,6 +1218,26 @@
     </div>
     <div class="live-more">
       <a class="playlist-view-link" id="livePlaylistViewLink" href="https://www.youtube.com/playlist?list=PLDbXt_pH_9ro" target="_blank" rel="noopener noreferrer">View on YouTube &rarr;</a>
+    </div>
+
+    <div class="featured-solos">
+      <div class="eyebrow">Featured solos</div>
+      <p class="featured-solos-sub">Gregg Hollister &amp; Friends &middot; Fusion Cafe, Butler, NJ &middot; June 16, 2023</p>
+      <div class="solo-buttons" role="group" aria-label="Jump to a guitar solo">
+        <button type="button" class="solo-btn is-active" data-start="1843">Solo 1 &middot; 30:43</button>
+        <button type="button" class="solo-btn" data-start="2440">Solo 2 &middot; 40:40</button>
+        <button type="button" class="solo-btn" data-start="3315">Solo 3 &middot; 55:15</button>
+        <button type="button" class="solo-btn" data-start="3739">Solo 4 &middot; 1:02:19</button>
+        <button type="button" class="solo-btn" data-start="4512">Solo 5 &middot; 1:15:12</button>
+        <button type="button" class="solo-btn" data-start="5515">Solo 6 &middot; 1:31:55</button>
+        <button type="button" class="solo-btn" data-start="6079">Solo 7 &middot; 1:41:19</button>
+      </div>
+      <div class="playlist-frame-wrap">
+        <iframe id="soloFrame" src="https://www.youtube-nocookie.com/embed/-49MkTRAt8s?start=1843" title="Rob Reich guitar solo, Gregg Hollister and Friends at the Fusion Cafe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <div class="live-more">
+        <a class="playlist-view-link" href="https://www.youtube.com/watch?v=-49MkTRAt8s" target="_blank" rel="noopener noreferrer">Video by Brian Duva &middot; full show on YouTube &rarr;</a>
+      </div>
     </div>
   </div>
 </section>
@@ -2072,6 +2116,20 @@
         tab.setAttribute('aria-selected', 'true');
         frame.src = 'https://www.youtube-nocookie.com/embed/videoseries?list=' + listId;
         viewLink.href = 'https://www.youtube.com/playlist?list=' + listId;
+      });
+    });
+  })();
+
+  // ---------- Featured solos: jump the embedded show to each solo ----------
+  (function () {
+    var frame = document.getElementById('soloFrame');
+    var btns = document.querySelectorAll('.solo-btn');
+    if (!frame || !btns.length) return;
+    btns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        btns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+        frame.src = 'https://www.youtube-nocookie.com/embed/-49MkTRAt8s?start=' +
+          btn.getAttribute('data-start') + '&autoplay=1';
       });
     });
   })();
