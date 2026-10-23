@@ -524,6 +524,11 @@
   }
   .solo-btn:hover, .solo-btn:focus-visible { color: #F3ECDC; border-color: rgba(237,230,214,0.5); }
   .solo-btn.is-active { background: var(--gold); border-color: var(--gold); color: #1B160F; }
+  /* two lines per button: song name, then its time */
+  .solo-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .solo-song { display: block; }
+  .solo-time { display: block; font-size: 0.9em; opacity: 0.7; letter-spacing: 0.02em; }
+  .solo-btn.is-active .solo-time { opacity: 0.85; }
   .playlist-view-link {
     display: inline-flex;
     align-items: center;
@@ -1237,14 +1242,14 @@
       <div class="eyebrow">Featured solos</div>
       <p class="featured-solos-sub">Gregg Hollister &amp; Friends &middot; Fusion Cafe, Butler, NJ &middot; June 16, 2023</p>
       <div class="solo-buttons" role="group" aria-label="Jump to a guitar solo">
-        <button type="button" class="solo-btn is-active" data-start="1843">Solo 1 &middot; 30:43</button>
-        <button type="button" class="solo-btn" data-start="2440">Solo 2 &middot; 40:40</button>
-        <button type="button" class="solo-btn" data-start="3315">Solo 3 &middot; 55:15</button>
-        <button type="button" class="solo-btn" data-start="3739">Solo 4 &middot; 1:02:19</button>
-        <button type="button" class="solo-btn" data-start="4642">Solo 5 &middot; 1:17:22</button>
-        <button type="button" class="solo-btn" data-start="4938">Solo 6 &middot; 1:22:18</button>
-        <button type="button" class="solo-btn" data-start="5515">Solo 7 &middot; 1:31:55</button>
-        <button type="button" class="solo-btn" data-start="6079">Solo 8 &middot; 1:41:19</button>
+        <button type="button" class="solo-btn is-active" data-start="1843" aria-label="Yellow Moon, Rob Reich guitar solo at 30:43"><span class="solo-song">Yellow Moon</span><span class="solo-time">30:43</span></button>
+        <button type="button" class="solo-btn" data-start="2440" aria-label="Long Time Gone, Rob Reich guitar solo at 40:40"><span class="solo-song">Long Time Gone</span><span class="solo-time">40:40</span></button>
+        <button type="button" class="solo-btn" data-start="3315" aria-label="Fire, Rob Reich guitar solo at 55:15"><span class="solo-song">Fire</span><span class="solo-time">55:15</span></button>
+        <button type="button" class="solo-btn" data-start="3739" aria-label="The Way It Is, Rob Reich guitar solo at 1:02:19"><span class="solo-song">The Way It Is</span><span class="solo-time">1:02:19</span></button>
+        <button type="button" class="solo-btn" data-start="4642" aria-label="Thank You, Rob Reich guitar solo at 1:17:22"><span class="solo-song">Thank You</span><span class="solo-time">1:17:22</span></button>
+        <button type="button" class="solo-btn" data-start="4938" aria-label="Woodstock, Rob Reich guitar solo at 1:22:18"><span class="solo-song">Woodstock</span><span class="solo-time">1:22:18</span></button>
+        <button type="button" class="solo-btn" data-start="5515" aria-label="Soulshine, Rob Reich guitar solo at 1:31:55"><span class="solo-song">Soulshine</span><span class="solo-time">1:31:55</span></button>
+        <button type="button" class="solo-btn" data-start="6079" aria-label="Compared to What, Rob Reich guitar solo at 1:41:19"><span class="solo-song">Compared to What</span><span class="solo-time">1:41:19</span></button>
       </div>
       <div class="playlist-frame-wrap">
         <iframe id="soloFrame" src="https://www.youtube-nocookie.com/embed/-49MkTRAt8s?start=1843" title="Rob Reich guitar solo, Gregg Hollister and Friends at the Fusion Cafe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
