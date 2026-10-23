@@ -805,6 +805,13 @@
     background: #E0B267;
     cursor: pointer;
   }
+  /* very small phones only (<= 360px): let the recordings player shrink to fit */
+  @media (max-width: 360px) {
+    .recordings-grid { grid-template-columns: minmax(0, 1fr); }
+    .recordings-grid > * { min-width: 0; }
+    .player { padding: 4px 16px; }
+    .player-progress, .playlist-title { min-width: 0; }
+  }
   .recordings-note {
     margin-top: 18px;
     font-size: 14px;
