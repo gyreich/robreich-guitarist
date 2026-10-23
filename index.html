@@ -501,7 +501,13 @@
     font-size: 18px;
     color: #DCD2BC;
   }
-  .solo-buttons { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px; }
+  /* even grid so the eight buttons line up: 4 per row on wide screens, 2 on phones */
+  .solo-buttons { margin-top: 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  @media (max-width: 640px) {
+    .solo-buttons { grid-template-columns: repeat(2, 1fr); }
+    .solo-btn { font-size: 11.5px; padding: 10px 6px; white-space: nowrap; }
+  }
+  @media (max-width: 360px) { .solo-buttons { grid-template-columns: 1fr; } }
   /* looks like .playlist-tab, but a separate class so the playlist tab script ignores it */
   .solo-btn {
     font-family: 'IBM Plex Mono', monospace;
