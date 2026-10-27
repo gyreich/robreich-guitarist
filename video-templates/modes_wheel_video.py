@@ -64,17 +64,11 @@ def lerp(a, b, t):
     return tuple(int(round(a[i] + (b[i] - a[i]) * t)) for i in range(3))
 
 
-def wedge_colors(n):
-    anchors = [GOLD_STRONG, GOLD_MID, INDIGO, INDIGO_STRONG]
-    out = []
-    for i in range(n):
-        pos = i / (n - 1) * (len(anchors) - 1)
-        k = min(int(pos), len(anchors) - 2)
-        out.append(lerp(anchors[k], anchors[k + 1], pos - k))
-    return out
-
-
-COLORS = wedge_colors(len(MODES))
+# Light to dark in wheel order (brightest to darkest), same hex values as the
+# website's wheel. (Videos made before Oct 2026 used a gold-to-indigo blend.)
+COLORS = [(250, 226, 170), (240, 185, 92), (214, 136, 62), (176, 96, 92),
+          (124, 74, 128), (78, 62, 150), (44, 40, 98)]
+LABEL_DARK = [True, True, True, False, False, False, False]   # dark text on the three light wedges
 
 
 def draw_wheel(active=None, all_lit=False):
@@ -92,7 +86,7 @@ def draw_wheel(active=None, all_lit=False):
         a0, a1 = 360 / n * i - 90, 360 / n * (i + 1) - 90
         mid = math.radians((a0 + a1) / 2)
         lit = all_lit or active is None or i in lit_set
-        col = COLORS[i] if lit else lerp(COLORS[i], NAVY, 0.62)
+        col = COLORS[i] if lit else lerp(COLORS[i], NAVY, 0.35)
         if active is None and not all_lit:
             col = lerp(COLORS[i], NAVY, 0.25)
         off = 18 * S if i in lit_set else 0
@@ -109,7 +103,10 @@ def draw_wheel(active=None, all_lit=False):
         lr = (r_out + r_in) / 2
         lx, ly = c + ox + lr * math.cos(mid), c + oy + lr * math.sin(mid)
         f = mono(23 * S, semibold=True)
-        txt_col = DARK if lit else lerp(COLORS[i], NAVY, 0.15)
+        if lit:
+            txt_col = DARK if LABEL_DARK[i] else (253, 246, 232)
+        else:
+            txt_col = lerp(COLORS[i], (255, 250, 235), 0.75 if LABEL_DARK[i] else 0.55)
         d.text((lx, ly), name.upper(), font=f, fill=txt_col + (255,), anchor="mm")
     d.text((c, c - 34 * S), "KEY OF", font=mono(22 * S, semibold=True), fill=ICE + (255,), anchor="mm")
     d.text((c, c + 30 * S), "C", font=fraunces(110 * S, 600), fill=TEXT + (255,), anchor="mm")

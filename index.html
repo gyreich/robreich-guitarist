@@ -875,7 +875,6 @@
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11.5px;
     font-weight: 500;
-    fill: var(--paper);
     pointer-events: none;
     text-transform: uppercase;
     letter-spacing: 0.02em;
@@ -1951,41 +1950,10 @@
     var cx = 200, cy = 200, rOuter = 176, rInner = 64;
     var n = modes.length;
 
-    // Build the wedge palette from the site's own gold/indigo tokens (so it
-    // automatically follows light/dark mode) instead of a hardcoded rainbow.
-    function hexToRgb(hex) {
-      hex = hex.trim().replace('#', '');
-      return [parseInt(hex.slice(0, 2), 16), parseInt(hex.slice(2, 4), 16), parseInt(hex.slice(4, 6), 16)];
-    }
-    function rgbToHex(rgb) {
-      return '#' + rgb.map(function (v) {
-        return Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0');
-      }).join('');
-    }
-    function multiStopGradient(colors, steps) {
-      var rgbs = colors.map(hexToRgb);
-      var last = rgbs.length - 1;
-      var result = [];
-      for (var i = 0; i < steps; i++) {
-        var t = i / (steps - 1);
-        var pos = t * last;
-        var idx = Math.min(Math.floor(pos), last - 1);
-        var localT = pos - idx;
-        var c = [0, 1, 2].map(function (ch) {
-          return rgbs[idx][ch] + (rgbs[idx + 1][ch] - rgbs[idx][ch]) * localT;
-        });
-        result.push(rgbToHex(c));
-      }
-      return result;
-    }
-    var rootStyle = getComputedStyle(document.documentElement);
-    var paletteAnchors = [
-      rootStyle.getPropertyValue('--gold-strong'),
-      rootStyle.getPropertyValue('--gold'),
-      rootStyle.getPropertyValue('--indigo'),
-      rootStyle.getPropertyValue('--indigo-strong')
-    ];
-    var goldTones = multiStopGradient(paletteAnchors, n);
+    // Light to dark in the wheel's order (brightest to darkest): pale cream for
+    // Lydian down to deep indigo for Locrian. Same colors as the YouTube videos.
+    var goldTones = ['#fae2aa', '#f0b95c', '#d6883e', '#b0605c', '#7c4a80', '#4e3e96', '#2c2862'];
+    var labelTones = ['#1c170f', '#1c170f', '#1c170f', '#fdf6e8', '#fdf6e8', '#fdf6e8', '#fdf6e8'];
 
     function polar(r, deg) {
       var rad = (deg - 90) * Math.PI / 180;
@@ -2027,6 +1995,7 @@
       label.setAttribute('text-anchor', 'middle');
       label.setAttribute('dominant-baseline', 'middle');
       label.setAttribute('class', 'mode-label');
+      label.setAttribute('fill', labelTones[i]);
       label.textContent = m.name;
       g.appendChild(label);
 
