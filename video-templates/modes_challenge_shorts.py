@@ -1,7 +1,7 @@
 """
 Challenge series: one vertical Short per mode. Rob plays the mode's Intro
 Track for 8s, then his guitar drops out and the viewer gets 45s to solo over
-the backing track, with a countdown, then a closing card. Its own look (wine
+the backing track, with a countdown, then a closing card. Its own look (teal
 background, gold MODES CHALLENGE banner, question headline) so a challenge
 never reads as one of the Master Class lesson Shorts.
 
@@ -44,26 +44,26 @@ def guitar_switch(d, on, y):
         x += w + 14
 
 
-WINE_DEEP, WINE, WINE_GLOW = (20, 6, 14), (48, 12, 28), (128, 34, 58)
+TEAL_DEEP, TEAL, TEAL_GLOW = (4, 18, 22), (10, 42, 50), (30, 108, 118)
 
 
 def challenge_canvas(seed=11):
-    """Like stage_canvas, but deep wine instead of navy: the challenge series' own color."""
+    """Like stage_canvas, but deep teal instead of navy: the challenge series' own color."""
     rnd = random.Random(seed)
-    im = Image.new("RGB", (W, H), WINE_DEEP)
+    im = Image.new("RGB", (W, H), TEAL_DEEP)
     grad = Image.new("L", (1, H))
     for y in range(H):
         grad.putpixel((0, y), int(255 * max(0.0, 1 - abs(y - H * 0.42) / (H * 0.62)) ** 1.6))
-    im = Image.composite(Image.new("RGB", (W, H), WINE), im, grad.resize((W, H)))
+    im = Image.composite(Image.new("RGB", (W, H), TEAL), im, grad.resize((W, H)))
     glow = Image.new("L", (W, H), 0)
     ImageDraw.Draw(glow).ellipse((W * 0.05, -H * 0.12, W * 0.95, H * 0.42), fill=120)
     glow = glow.filter(ImageFilter.GaussianBlur(170))
-    im = Image.composite(Image.new("RGB", (W, H), WINE_GLOW), im, glow)
+    im = Image.composite(Image.new("RGB", (W, H), TEAL_GLOW), im, glow)
     bokeh = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     bd = ImageDraw.Draw(bokeh)
     for _ in range(46):
         x, y, r = rnd.uniform(0, W), rnd.uniform(0, H), rnd.uniform(4, 22)
-        col = rnd.choice([(255, 150, 170), (230, 120, 140), GOLD, GOLD])
+        col = rnd.choice([(120, 220, 210), (90, 190, 200), GOLD, GOLD])
         bd.ellipse((x - r, y - r, x + r, y + r), fill=col + (rnd.randint(25, 60),))
     im = im.convert("RGBA")
     im.alpha_composite(bokeh.filter(ImageFilter.GaussianBlur(6)))
