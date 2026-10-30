@@ -36,9 +36,12 @@ TRACKS = {
         "album": None,
         "photos": [
             ("walter-smith-photo-rob-pleasantdale-chateau-natural.jpg", "full", 0.0),
-            ("rr-mark-hagan.jpg", "framed", 0.5),            # Peter Salo photo
+            ("sylvain-durand-rob.jpg", "framed", 0.5),         # Sylvain Durand photo
             ("rr-Elliot-zigmund-john-richmond.jpg", "full", 0.3),
-            ("SanDiegoYachtRockFestivalwith.jpg", "full", 0.3),
+            # still from Rob's trio video (Eliot Zigmund drums, Rene Hart bass), brightened:
+            # ffmpeg -ss 62 -i "...Dream Dancin (Part 1).mp4" -frames:v 1
+            #   -vf eq=brightness=0.06:contrast=1.12:saturation=0.9:gamma=1.25
+            ("trio-dream-dancing-still.png", "full", 0.4),
         ],
         "close_photo": "Rob-listen-headphone-guitar.png",
         "out": "rob-reich-new-swing-official-audio.mp4",
