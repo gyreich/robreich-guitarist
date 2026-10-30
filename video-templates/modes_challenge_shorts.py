@@ -20,7 +20,7 @@ from modes_wheel_video import (MODES, DOWNBEAT, GOLD_STRONG, DARK, LINE, OUT, MO
 from modes_wheel_short import draw_chips
 
 W, H = 1080, 1920
-ROB_LEN, TURN_LEN, END_LEN, FADE = 8.0, 45.0, 4.0, 3.0   # music fades under the end card
+ROB_LEN, TURN_LEN, END_LEN, FADE = 8.0, 45.0, 5.0, 3.5   # music fades under the end card
 SERIES = os.path.join(OUT, "challenge")
 
 
@@ -105,9 +105,11 @@ def end_frame(i):
     im = challenge_canvas()
     d = ImageDraw.Draw(im)
     banner(d)
-    d.text((W / 2, 250), "Nice playing!", font=fraunces(104, 600), fill=TEXT, anchor="mm")
-    wheel = draw_wheel(i).resize((560, 560), Image.LANCZOS)
-    im.alpha_composite(wheel, ((W - 560) // 2, 380))
+    d.text((W / 2, 240), "Nice playing!", font=fraunces(104, 600), fill=TEXT, anchor="mm")
+    d.text((W / 2, 345), "Tell Rob how it went in the comments", font=fraunces(48, 500),
+           fill=GOLD_STRONG, anchor="mm")
+    wheel = draw_wheel(i).resize((520, 520), Image.LANCZOS)
+    im.alpha_composite(wheel, ((W - 520) // 2, 430))
     d.text((W / 2, 1040), f"Want the full C {name} track,", font=fraunces(54, 600), fill=TEXT, anchor="mm")
     d.text((W / 2, 1112), "with Rob's guitar on or off?", font=fraunces(54, 600), fill=TEXT, anchor="mm")
     d.text((W / 2, 1200), "Free at robreichguitar.com", font=mono(42, True), fill=GOLD_STRONG, anchor="mm")
