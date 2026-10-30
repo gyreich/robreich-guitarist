@@ -6,6 +6,7 @@ card (left half kept clear of photos for YouTube's end-screen elements).
 
     python3 official_audio_video.py new-swing
 """
+import hashlib
 import os
 import subprocess
 import sys
@@ -35,7 +36,7 @@ TRACKS = {
         "album": None,
         "photos": [
             ("walter-smith-photo-rob-pleasantdale-chateau-natural.jpg", "full", 0.0),
-            ("rr-jazz-brunch-falcon.jpg", "framed", 0.5),
+            ("rr-mark-hagan.jpg", "framed", 0.5),            # Peter Salo photo
             ("rr-Elliot-zigmund-john-richmond.jpg", "full", 0.3),
             ("SanDiegoYachtRockFestivalwith.jpg", "full", 0.3),
         ],
@@ -120,9 +121,12 @@ def build(key):
     clips.append((cl, total - close_start, "hold"))
 
     parts = []
-    for k, (png, secs, kind) in enumerate(clips):
-        mp4 = os.path.join(tmp, f"clip{k}.mp4")
-        (push_in if kind == "push" else hold)(png, secs, mp4)
+    for png, secs, kind in clips:
+        # cache by content: rerunning after swapping one photo only re-renders that clip
+        tag = hashlib.md5(open(png, "rb").read() + f"{secs:.3f}{kind}".encode()).hexdigest()[:12]
+        mp4 = os.path.join(tmp, f"clip-{tag}.mp4")
+        if not os.path.exists(mp4):
+            (push_in if kind == "push" else hold)(png, secs, mp4)
         parts.append((mp4, secs))
 
     inputs, fc, label, off = [], [], "[0:v]", 0.0
