@@ -48,14 +48,15 @@ def make_opening_card(bg_path, out_path, artist="ROB REICH", track="NEW DAY",
 
     h_artist = line_h(f_artist)
     h_line1 = 3
-    h_track = line_h(f_track, "NEW DAY Qy")
+    h_track = line_h(f_track, track + " Qy")
     h_format = line_h(f_format)
     h_line2 = 3
-    h_album = line_h(f_album_bright, album_name + " Qy")
+    h_album = line_h(f_album_bright, (album_name or "") + " Qy") if album_name else 0
 
     total_h = (h_artist + 28 + h_line1 + gap_artist_to_track + h_track +
-               gap_track_to_format + h_format + 30 + h_line2 +
-               gap_format_to_album + h_album)
+               gap_track_to_format + h_format)
+    if album_name:   # no album row for a single that isn't on an album yet
+        total_h += 30 + h_line2 + gap_format_to_album + h_album
 
     y = (H - total_h) // 2 - 20
 
@@ -76,6 +77,9 @@ def make_opening_card(bg_path, out_path, artist="ROB REICH", track="NEW DAY",
     y += h_track + gap_track_to_format
 
     draw_tracked(draw, cx, y, format_label, f_format, GOLD, tracking=11)
+    if not album_name:
+        im.save(out_path, "PNG")
+        return out_path
     y += h_format + 30
 
     draw.rectangle((cx - 60, y, cx + 60, y + 3), fill=GOLD)
