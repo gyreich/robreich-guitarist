@@ -529,6 +529,23 @@
   .solo-song { display: block; }
   .solo-time { display: block; font-size: 0.9em; opacity: 0.7; letter-spacing: 0.02em; }
   .solo-btn.is-active .solo-time { opacity: 0.85; }
+  /* choose a show above the solo buttons: underlined text tabs, quieter than the buttons */
+  .show-tabs { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px 24px; }
+  .show-tab {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #C9BFA9;
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    padding: 6px 0;
+    cursor: pointer;
+  }
+  .show-tab:hover, .show-tab:focus-visible { color: #F3ECDC; }
+  .show-tab.is-active { color: var(--gold); border-bottom-color: var(--gold); }
+  .solo-show[hidden] { display: none; }
   .playlist-view-link {
     display: inline-flex;
     align-items: center;
@@ -1240,22 +1257,37 @@
 
     <div class="featured-solos">
       <div class="eyebrow">Featured solos</div>
-      <p class="featured-solos-sub">Gregg Hollister &amp; Friends &middot; Fusion Cafe, Butler, NJ &middot; June 16, 2023</p>
-      <div class="solo-buttons" role="group" aria-label="Jump to a guitar solo">
-        <button type="button" class="solo-btn is-active" data-start="1843" aria-label="Yellow Moon, Rob Reich guitar solo at 30:43"><span class="solo-song">Yellow Moon</span><span class="solo-time">30:43</span></button>
-        <button type="button" class="solo-btn" data-start="2440" aria-label="Long Time Gone, Rob Reich guitar solo at 40:40"><span class="solo-song">Long Time Gone</span><span class="solo-time">40:40</span></button>
-        <button type="button" class="solo-btn" data-start="3315" aria-label="Fire, Rob Reich guitar solo at 55:15"><span class="solo-song">Fire</span><span class="solo-time">55:15</span></button>
-        <button type="button" class="solo-btn" data-start="3739" aria-label="The Way It Is, Rob Reich guitar solo at 1:02:19"><span class="solo-song">The Way It Is</span><span class="solo-time">1:02:19</span></button>
-        <button type="button" class="solo-btn" data-start="4642" aria-label="Thank You, Rob Reich guitar solo at 1:17:22"><span class="solo-song">Thank You</span><span class="solo-time">1:17:22</span></button>
-        <button type="button" class="solo-btn" data-start="4938" aria-label="Woodstock, Rob Reich guitar solo at 1:22:18"><span class="solo-song">Woodstock</span><span class="solo-time">1:22:18</span></button>
-        <button type="button" class="solo-btn" data-start="5515" aria-label="Soulshine, Rob Reich guitar solo at 1:31:55"><span class="solo-song">Soulshine</span><span class="solo-time">1:31:55</span></button>
-        <button type="button" class="solo-btn" data-start="6079" aria-label="Compared to What, Rob Reich guitar solo at 1:41:19"><span class="solo-song">Compared to What</span><span class="solo-time">1:41:19</span></button>
+      <div class="show-tabs" role="tablist" aria-label="Choose a show">
+        <button type="button" class="show-tab is-active" role="tab" aria-selected="true" data-show="fusion">Fusion Cafe &middot; June 2023</button>
+        <button type="button" class="show-tab" role="tab" aria-selected="false" data-show="alphawave">Alpha Wave Studios &middot; Aug 2023</button>
+      </div>
+      <div class="solo-show" data-show="fusion" data-video="-49MkTRAt8s" data-credit="Video by Brian Duva &middot; full show on YouTube &rarr;">
+        <p class="featured-solos-sub">Gregg Hollister &amp; Friends &middot; Fusion Cafe, Butler, NJ &middot; June 16, 2023</p>
+        <div class="solo-buttons" role="group" aria-label="Jump to a guitar solo">
+          <button type="button" class="solo-btn is-active" data-start="1843" aria-label="Yellow Moon, Rob Reich guitar solo at 30:43"><span class="solo-song">Yellow Moon</span><span class="solo-time">30:43</span></button>
+          <button type="button" class="solo-btn" data-start="2440" aria-label="Long Time Gone, Rob Reich guitar solo at 40:40"><span class="solo-song">Long Time Gone</span><span class="solo-time">40:40</span></button>
+          <button type="button" class="solo-btn" data-start="3315" aria-label="Fire, Rob Reich guitar solo at 55:15"><span class="solo-song">Fire</span><span class="solo-time">55:15</span></button>
+          <button type="button" class="solo-btn" data-start="3739" aria-label="The Way It Is, Rob Reich guitar solo at 1:02:19"><span class="solo-song">The Way It Is</span><span class="solo-time">1:02:19</span></button>
+          <button type="button" class="solo-btn" data-start="4642" aria-label="Thank You, Rob Reich guitar solo at 1:17:22"><span class="solo-song">Thank You</span><span class="solo-time">1:17:22</span></button>
+          <button type="button" class="solo-btn" data-start="4938" aria-label="Woodstock, Rob Reich guitar solo at 1:22:18"><span class="solo-song">Woodstock</span><span class="solo-time">1:22:18</span></button>
+          <button type="button" class="solo-btn" data-start="5515" aria-label="Soulshine, Rob Reich guitar solo at 1:31:55"><span class="solo-song">Soulshine</span><span class="solo-time">1:31:55</span></button>
+          <button type="button" class="solo-btn" data-start="6079" aria-label="Compared to What, Rob Reich guitar solo at 1:41:19"><span class="solo-song">Compared to What</span><span class="solo-time">1:41:19</span></button>
+        </div>
+      </div>
+      <div class="solo-show" data-show="alphawave" data-video="ZMyD7ymR-UM" data-credit="Full open-mic set on YouTube &rarr;" hidden>
+        <p class="featured-solos-sub">Gregg Hollister &amp; Friends &middot; Open mic, Alpha Wave Studios, Whippany, NJ &middot; August 2023</p>
+        <div class="solo-buttons" role="group" aria-label="Jump to a guitar solo">
+          <button type="button" class="solo-btn" data-start="200" aria-label="Yellow Moon, Rob Reich guitar solo at 3:20"><span class="solo-song">Yellow Moon</span><span class="solo-time">3:20</span></button>
+          <button type="button" class="solo-btn" data-start="570" aria-label="Long Time, Rob Reich guitar solo at 9:30"><span class="solo-song">Long Time</span><span class="solo-time">9:30</span></button>
+          <button type="button" class="solo-btn" data-start="1154" aria-label="The Way It Is, Rob Reich guitar solo at 19:14"><span class="solo-song">The Way It Is</span><span class="solo-time">19:14</span></button>
+          <button type="button" class="solo-btn" data-start="1390" aria-label="Driven to Tears, Rob Reich guitar solo at 23:10"><span class="solo-song">Driven to Tears</span><span class="solo-time">23:10</span></button>
+        </div>
       </div>
       <div class="playlist-frame-wrap">
-        <iframe id="soloFrame" src="https://www.youtube-nocookie.com/embed/-49MkTRAt8s?start=1843" title="Rob Reich guitar solo, Gregg Hollister and Friends at the Fusion Cafe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
+        <iframe id="soloFrame" src="https://www.youtube-nocookie.com/embed/-49MkTRAt8s?start=1843" title="Rob Reich guitar solos with Gregg Hollister and Friends" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
       </div>
       <div class="live-more">
-        <a class="playlist-view-link" href="https://www.youtube.com/watch?v=-49MkTRAt8s" target="_blank" rel="noopener noreferrer">Video by Brian Duva &middot; full show on YouTube &rarr;</a>
+        <a class="playlist-view-link" id="soloShowLink" href="https://www.youtube.com/watch?v=-49MkTRAt8s" target="_blank" rel="noopener noreferrer">Video by Brian Duva &middot; full show on YouTube &rarr;</a>
       </div>
     </div>
   </div>
@@ -2142,13 +2174,37 @@
   // ---------- Featured solos: jump the embedded show to each solo ----------
   (function () {
     var frame = document.getElementById('soloFrame');
+    var link = document.getElementById('soloShowLink');
     var btns = document.querySelectorAll('.solo-btn');
+    var shows = document.querySelectorAll('.solo-show');
+    var tabs = document.querySelectorAll('.show-tab');
     if (!frame || !btns.length) return;
+    function videoOf(el) { return el.closest('.solo-show').getAttribute('data-video'); }
+    function load(btn, autoplay) {
+      btns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+      frame.src = 'https://www.youtube-nocookie.com/embed/' + videoOf(btn) + '?start=' +
+        btn.getAttribute('data-start') + (autoplay ? '&autoplay=1' : '');
+    }
     btns.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        btns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
-        frame.src = 'https://www.youtube-nocookie.com/embed/-49MkTRAt8s?start=' +
-          btn.getAttribute('data-start') + '&autoplay=1';
+      btn.addEventListener('click', function () { load(btn, true); });
+    });
+    // switching shows cues up that show's first solo without playing it
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        var key = tab.getAttribute('data-show');
+        tabs.forEach(function (t) {
+          t.classList.toggle('is-active', t === tab);
+          t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+        });
+        shows.forEach(function (sh) {
+          var on = sh.getAttribute('data-show') === key;
+          sh.hidden = !on;
+          if (on) {
+            load(sh.querySelector('.solo-btn'), false);
+            link.href = 'https://www.youtube.com/watch?v=' + sh.getAttribute('data-video');
+            link.innerHTML = sh.getAttribute('data-credit');
+          }
+        });
       });
     });
   })();
