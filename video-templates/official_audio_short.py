@@ -43,9 +43,9 @@ SHORTS = {
         "start": 154.5, "end": 181.8,
         "photos": [
             ("mohegan-fried-cover.jpg", "framed", None),
-            ("rob-hilltop-16m19s-closeup.jpg", "full", 0.40),     # ZeeZee Shots Photography
-            ("rob-hilltop-action-closeup.png", "full", 0.5),
-            ("rob-hilltop-action-with-drums.png", "full", 0.13),
+            ("Rob-many-years-ago.png", "framed", None),           # younger Rob, closer to 1994
+            ("rr-shared-by-peter-salo.jpg", "framed", None),      # Peter Salo photo
+            ("rob-hilltop-action-closeup.png", "full", 0.5),      # ZeeZee Shots Photography
         ],
         "out": "rob-reich-mohegan-everythings-fried-solo-short.mp4",
     },
