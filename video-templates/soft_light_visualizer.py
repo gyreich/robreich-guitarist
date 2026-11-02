@@ -34,6 +34,8 @@ PIECES = {
     "thirty-seconds-madness": {
         "audio": os.path.join(ROOT, "Album Wake Up Rob Reich", "09 30 Seconds Madness.mp3"),
         "start": 90.0, "end": 142.0,
+        "tail": 143.8,      # last notes ring out; a loud new phrase starts at 143.9, so silent by then
+        "end_len": 3.0,
         "head": ("ROB REICH", "30 SECONDS MADNESS", "FROM THE ALBUM WAKE UP"),
         # cool and electric: sapphire, teal, ice, violet on midnight blue
         "palette": [(70, 120, 255), (40, 210, 200), (190, 230, 255), (150, 100, 255)],
@@ -104,7 +106,7 @@ def build(key):
     CUR.clear()
     CUR.update(p)
     music = p["end"] - p["start"]
-    total = music + END_LEN
+    total = music + p.get("end_len", END_LEN)
     lv = loudness(p["audio"], p["start"], music)
     rnd = random.Random(3)
     orbs = [dict(x=rnd.uniform(0, SW), y=rnd.uniform(0, SH), r=rnd.uniform(10, 34),
@@ -149,8 +151,11 @@ def build(key):
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-framerate", str(FPS),
                     "-i", os.path.join(frames, "%05d.jpg"),
                     "-ss", str(p["start"]), "-t", str(total), "-i", p["audio"],
-                    # the music keeps playing under the closing card, fading over its last seconds
-                    "-filter_complex", f"[1:a]afade=t=in:d=1.5,afade=t=out:st={total - 2.5:.3f}:d=2.5,apad[a]",
+                    # the music keeps playing under the closing card, fading over its last seconds;
+                    # with a "tail", it fades from the card's dissolve to silence at that moment
+                    "-filter_complex", "[1:a]afade=t=in:d=1.5," + (
+                        f"afade=t=out:st={music - XF:.3f}:d={p['tail'] - p['start'] - (music - XF):.3f},apad[a]"
+                        if "tail" in p else f"afade=t=out:st={total - 2.5:.3f}:d=2.5,apad[a]"),
                     "-map", "0:v", "-map", "[a]", "-t", f"{total:.3f}",
                     "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", "-preset", "slow",
                     "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", final], check=True)
