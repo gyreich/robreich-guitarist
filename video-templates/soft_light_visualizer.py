@@ -36,6 +36,8 @@ PIECES = {
         "start": 90.0, "end": 142.0,
         "tail": 143.8,      # last notes ring out; a loud new phrase starts at 143.9, so silent by then
         "end_len": 3.0,
+        # Rob's photo opens the Short (a frame to pick as the Shorts cover), then dissolves into the light
+        "intro_photo": "about-section-photo.jpg",          # the About-section portrait
         "head": ("ROB REICH", "30 SECONDS MADNESS", "FROM THE ALBUM WAKE UP"),
         # cool and electric: sapphire, teal, ice, violet on midnight blue
         "palette": [(70, 120, 255), (40, 210, 200), (190, 230, 255), (150, 100, 255)],
@@ -99,6 +101,30 @@ def end_card(head):
 
 
 CUR = {}
+INTRO_HOLD, INTRO_FADE = 3.0, 2.0     # photo fully visible, then dissolving into the light
+
+
+def intro_image(p):
+    """The photo filling the frame below the title, edges melting into the background."""
+    src = Image.open(os.path.join(ROOT, "Gallery Images", p["intro_photo"])).convert("RGB")
+    ph, top = H - 470, 470
+    if src.height > src.width:        # a portrait: shown whole and centered, edges melting away
+        s = min((ph - 80) / src.height, (W - 120) / src.width)
+        src = src.resize((round(src.width * s), round(src.height * s)), Image.LANCZOS)
+        im = Image.new("RGB", (W, H), p.get("bg", (14, 10, 16)))
+        mask = Image.new("L", src.size, 0)
+        ImageDraw.Draw(mask).rounded_rectangle((40, 40, src.width - 40, src.height - 40), 80, fill=255)
+        im.paste(src, ((W - src.width) // 2, top + (ph - src.height) // 2), mask.filter(ImageFilter.GaussianBlur(40)))
+        return im
+    s = max(ph / src.height, W / src.width)
+    src = src.resize((round(src.width * s), round(src.height * s)), Image.LANCZOS)
+    x = min(max(0, round(src.width * p.get("intro_x", 0.5) - W / 2)), src.width - W)
+    photo = src.crop((x, 0, x + W, ph))
+    im = Image.new("RGB", (W, H), p.get("bg", (14, 10, 16)))
+    mask = Image.new("L", (W, ph), 0)
+    ImageDraw.Draw(mask).rounded_rectangle((60, 60, W - 60, ph - 60), 120, fill=255)
+    im.paste(photo, (0, top), mask.filter(ImageFilter.GaussianBlur(60)))
+    return im
 
 
 def build(key):
@@ -113,6 +139,7 @@ def build(key):
                  v=rnd.uniform(1.5, 5.0), sway=rnd.uniform(4, 14), ph=rnd.uniform(0, 6.28),
                  c=rnd.uniform(0, 1), a=rnd.uniform(60, 140)) for _ in range(34)]
     title = title_layer(p["head"])
+    intro = intro_image(p) if "intro_photo" in p else None
     card = end_card(p["head"])
     out_dir = os.path.join(HERE, "originals")
     frames = os.path.join(out_dir, f".work-{key}-frames")
@@ -135,15 +162,20 @@ def build(key):
         g = np.exp(-((XX - SW / 2) ** 2 + (YY - SH * 0.58) ** 2) / (cr * cr))
         acc += g[..., None] * np.array(color_at(t, 0.5), float) * (0.35 + 0.55 * level)
         bg = Image.fromarray(np.clip(acc, 0, 255).astype(np.uint8))
-        im = bg.convert("RGB").resize((W, H), Image.BICUBIC).convert("RGBA")
-        ta = min(1.0, max(0.0, (t - 1.0) / 2.0))             # title fades in after the light
+        im = bg.convert("RGB").resize((W, H), Image.BICUBIC)
+        if intro is not None and t < INTRO_HOLD + INTRO_FADE:
+            a = 1.0 if t < INTRO_HOLD else 1 - (t - INTRO_HOLD) / INTRO_FADE
+            im = Image.blend(im, intro, a * a * (3 - 2 * a))
+        im = im.convert("RGBA")
+        ta = 1.0 if intro is not None else min(1.0, max(0.0, (t - 1.0) / 2.0))   # title fades in after the light
         if ta > 0:
             tl = title.copy()
             tl.putalpha(tl.getchannel("A").point(lambda v: int(v * ta)))
             im.alpha_composite(tl)
         im = im.convert("RGB")
-        if t < FADE_IN:                                      # from black
-            im = Image.blend(Image.new("RGB", (W, H), (0, 0, 0)), im, t / FADE_IN)
+        if t < (0.8 if intro is not None else FADE_IN):      # from black
+            fade = 0.8 if intro is not None else FADE_IN
+            im = Image.blend(Image.new("RGB", (W, H), (0, 0, 0)), im, t / fade)
         if t > music - XF:                                   # dissolve into the closing card
             im = Image.blend(im, card, min(1.0, (t - (music - XF)) / XF))
         im.save(os.path.join(frames, f"{f:05d}.jpg"), quality=92)
