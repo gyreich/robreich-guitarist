@@ -156,7 +156,68 @@ SHORTS = {
         ],
         "end": ("Learn all 7 modes", "in Rob's free course"),
     },
+    "major-vs-minor": {
+        "title": "Major vs. minor",
+        "pieces": [(189.8, 280.6)],
+        "captions": [
+            (189.9, 192.2, "The answer is what you call intervals."),
+            (192.3, 194.6, "Intervals are distances between notes."),
+            (195.9, 198.4, "On a guitar, if we play from C to D,"),
+            (198.5, 200.3, "it's called the interval of a major second."),
+            (204.6, 207.6, "So if we play from C to D-flat,"),
+            (210.7, 212.1, "that's what's called a minor second."),
+            (212.8, 216.8, "When you change the intervals in any given scale or mode,"),
+            (216.8, 219.1, "you change the color of it."),
+            (219.2, 222.0, "So for example, the first three notes of C Ionian"),
+            (222.0, 227.1, "are C, D and E."),
+            (227.2, 229.3, "When we play C Dorian, the first three notes"),
+            (229.4, 234.0, "are C, D and E-flat."),
+            (234.3, 236.0, "That's a key difference right off the bat."),
+            (236.6, 240.9, "The third degree of that mode is E-flat,"),
+            (241.1, 244.4, "where the third degree of Ionian is E natural."),
+            (245.7, 248.8, "In terms of intervals, the E is called the major third,"),
+            (250.9, 252.7, "and it gives you the color of a major sound."),
+            (252.8, 254.2, "So if I play a C major chord,"),
+            (255.9, 257.5, "the first three notes of C Ionian,"),
+            (259.4, 260.5, "it works."),
+            (260.6, 263.2, "Now if I play the first three notes of C Dorian,"),
+            (263.2, 266.0, "C, D, E-flat,"),
+            (266.7, 268.1, "and play a C minor chord:"),
+            (272.9, 274.7, "All we've done is change one note."),
+            (275.3, 277.1, "But this is what happens in the modes themselves:"),
+            (277.2, 280.6, "each mode has a different interval construction."),
+        ],
+        "states": [
+            (189.8, 195.9, None, ("tag", "INTERVALS", "the distance between two notes")),
+            (195.9, 204.6, "Ionian", ("notes", (("C", 0), ("D", 0),), "MAJOR 2ND", "two frets apart")),
+            (204.6, 212.8, None, ("notes", (("C", 0), ("Db", 1),), "MINOR 2ND", "one fret apart")),
+            (212.8, 219.2, None, ("tag", "CHANGE AN INTERVAL", "and you change the color")),
+            (219.2, 227.2, "Ionian", ("notes", (("C", 0), ("D", 0), ("E", 0),), "C IONIAN", "first three notes")),
+            (227.2, 234.3, "Dorian", ("notes", (("C", 0), ("D", 0), ("Eb", 1),), "C DORIAN", "first three notes")),
+            (234.3, 245.7, ("Ionian", "Dorian"), ("notes", (("E", 0), ("Eb", 1),), "THE 3RD", "E natural vs. E-flat")),
+            (245.7, 252.8, "Ionian", ("notes", (("C", 0), ("E", 0),), "MAJOR 3RD", "the color of a major sound")),
+            (252.8, 260.6, "Ionian", ("notes", (("C", 0), ("E", 0), ("G", 0),), "C MAJOR CHORD", "major 3rd: E")),
+            (260.6, 272.9, "Dorian", ("notes", (("C", 0), ("Eb", 1), ("G", 0),), "C MINOR CHORD", "minor 3rd: E-flat")),
+            (272.9, 280.6, ("Ionian", "Dorian"), ("tag", "ONE NOTE", "turns major into minor")),
+        ],
+        "end": ("Hear how all 7 modes differ", "in Rob's free course"),
+    },
 }
+
+
+def notes(d, items, label, sub, cy=1070, cw=130, gap=26):
+    """A few big note chips; altered (flat) notes in gold."""
+    d.text((W / 2, cy - 50), label, font=mono(38, True), fill=GOLD, anchor="mm")
+    x0 = (W - (len(items) * cw + (len(items) - 1) * gap)) // 2
+    for j, (n, alt) in enumerate(items):
+        x = x0 + j * (cw + gap)
+        if alt:
+            d.rounded_rectangle((x, cy, x + cw, cy + cw), 16, fill=GOLD_STRONG)
+        else:
+            d.rounded_rectangle((x, cy, x + cw, cy + cw), 16, outline=LINE, width=3)
+        d.text((x + cw / 2, cy + cw / 2 + 2), n.replace("b", "\u266d") if False else n, font=fraunces(62, 600),
+               fill=(10, 14, 30) if alt else TEXT, anchor="mm")
+    d.text((W / 2, cy + cw + 46), sub, font=fraunces(38, 400), fill=ICE, anchor="mm")
 
 
 def row(d, k, label, cy, cw=100, gap=16):
@@ -208,6 +269,8 @@ def frame(spec, wheel_state, panel, caption, end_card):
         chips(d, IDX[panel[1]], 1060)
     elif panel[0] == "row":
         row(d, panel[1], panel[2], 1080)
+    elif panel[0] == "notes":
+        notes(d, panel[1], panel[2], panel[3])
     else:
         d.text((W / 2, 1080), panel[1], font=mono(40, True), fill=GOLD, anchor="mm")
         d.text((W / 2, 1140), panel[2], font=fraunces(40, 400), fill=ICE, anchor="mm")
