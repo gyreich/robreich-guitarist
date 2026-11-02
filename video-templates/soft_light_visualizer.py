@@ -28,6 +28,8 @@ PIECES = {
     "grateful": {
         "audio": os.path.join(ROOT, "Album Wake Up Rob Reich", "08 Grateful.mp3"),
         "start": 450.0, "end": 528.0,
+        # the studio headphones photo from the site gallery, warmed to rose/peach
+        "intro_photo": "site-headphones-acoustic-studio-pink.jpg", "intro_framed": True,
         "head": ("ROB REICH", "GRATEFUL", "FROM THE ALBUM WAKE UP"),
         "out": "rob-reich-grateful-soft-light-short.mp4",
     },
@@ -108,7 +110,7 @@ def intro_image(p):
     """The photo filling the frame below the title, edges melting into the background."""
     src = Image.open(os.path.join(ROOT, "Gallery Images", p["intro_photo"])).convert("RGB")
     ph, top = H - 470, 470
-    if src.height > src.width:        # a portrait: shown whole and centered, edges melting away
+    if src.height > src.width or p.get("intro_framed"):   # shown whole and centered, edges melting away
         s = min((ph - 80) / src.height, (W - 120) / src.width)
         src = src.resize((round(src.width * s), round(src.height * s)), Image.LANCZOS)
         im = Image.new("RGB", (W, H), p.get("bg", (14, 10, 16)))
