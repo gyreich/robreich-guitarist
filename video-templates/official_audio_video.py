@@ -4,7 +4,7 @@ card over a photo, a few photos of Rob playing (each with a slow push-in,
 dissolving into the next), a small robreichguitar.com credit, and the closing
 card (left half kept clear of photos for YouTube's end-screen elements).
 
-    python3 official_audio_video.py new-swing
+    python3 official_audio_video.py lift-off
 """
 import hashlib
 import os
@@ -30,9 +30,9 @@ XF = 1.5                # dissolve between photos
 # photos: (file in Gallery Images, "full" = fill the frame, "framed" = whole photo in a gold frame,
 #          vertical anchor for "full" crops: 0 keeps the top, 0.5 the middle)
 TRACKS = {
-    "new-swing": {
-        "audio": os.path.join(ROOT, "recordings", "new-swing.mp3"),
-        "title": "NEW SWING",
+    "lift-off": {          # was "New Swing" (a working title); same recording as Homeward's "Lift Off"
+        "audio": os.path.join(ROOT, "recordings", "lift-off.mp3"),
+        "title": "LIFT OFF",
         "album": None,
         "photos": [
             ("walter-smith-photo-rob-pleasantdale-chateau-natural.jpg", "full", 0.0),
@@ -42,7 +42,7 @@ TRACKS = {
             ("rob-club-hollowbody-trio.png", "full", 0.25),     # hollow-body, bass and drums
         ],
         "close_photo": "Rob-listen-headphone-guitar.png",
-        "out": "rob-reich-new-swing-official-audio.mp4",
+        "out": "rob-reich-lift-off-official-audio.mp4",
     },
 }
 

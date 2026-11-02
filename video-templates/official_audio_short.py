@@ -4,7 +4,7 @@ the song over vertical crops of the same photos (slow push-in, dissolves), the
 title at the top, and a closing card pointing to the full track (YouTube's
 Related video link) and the website.
 
-    python3 official_audio_short.py new-swing
+    python3 official_audio_short.py lift-off
 """
 import os
 import sys
@@ -23,9 +23,9 @@ END_LEN = 4.0
 
 # photos: (file, "full" crop centered on x (0-1 across the photo) | "framed")
 SHORTS = {
-    "new-swing": {
-        "audio": os.path.join(ROOT, "recordings", "new-swing.mp3"),
-        "title": "NEW SWING",
+    "lift-off": {          # was "New Swing"
+        "audio": os.path.join(ROOT, "recordings", "lift-off.mp3"),
+        "title": "LIFT OFF",
         "start": 113.0, "end": 152.3,      # the build to the loudest stretch
         "photos": [
             ("walter-smith-photo-rob-pleasantdale-chateau-natural.jpg", "full", 0.36),
@@ -33,7 +33,7 @@ SHORTS = {
             ("rob-club-hollowbody-trio.png", "full", 0.30),
             ("rr-Elliot-zigmund-john-richmond.jpg", "full", 0.16),
         ],
-        "out": "rob-reich-new-swing-short.mp4",
+        "out": "rob-reich-lift-off-short.mp4",
     },
     # Rob's solo on a 1994 band album: credits from the CD jacket
     "mohegan-everythings-fried": {
