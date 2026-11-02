@@ -36,12 +36,10 @@ TRACKS = {
         "album": None,
         "photos": [
             ("walter-smith-photo-rob-pleasantdale-chateau-natural.jpg", "full", 0.0),
+            ("rob-mezzrow-trio.png", "full", (0.0, 0.5)),       # trio at Mezzrow; keep Rob at left
             ("sylvain-durand-rob.jpg", "framed", 0.5),         # Sylvain Durand photo
             ("rr-Elliot-zigmund-john-richmond.jpg", "full", 0.3),
-            # still from Rob's trio video (Eliot Zigmund drums, Rene Hart bass), brightened:
-            # ffmpeg -ss 62 -i "...Dream Dancin (Part 1).mp4" -frames:v 1
-            #   -vf eq=brightness=0.06:contrast=1.12:saturation=0.9:gamma=1.25
-            ("trio-dream-dancing-still.png", "full", 0.4),
+            ("rob-club-hollowbody-trio.png", "full", 0.25),     # hollow-body, bass and drums
         ],
         "close_photo": "Rob-listen-headphone-guitar.png",
         "out": "rob-reich-new-swing-official-audio.mp4",
@@ -59,12 +57,14 @@ def duration(path):
     return int(h) * 3600 + int(m) * 60 + float(s)
 
 
-def fill_crop(im, anchor_y):
-    """Scale to fill 16:9, cropping the overflow; anchor_y picks which band of a tall photo stays."""
+def fill_crop(im, anchor):
+    """Scale to fill 16:9, cropping the overflow. anchor: vertical position (0 top .. 1 bottom),
+    or (x, y) to also choose which side of a wide photo stays."""
+    ax, ay = anchor if isinstance(anchor, tuple) else (0.5, anchor)
     s = max(W / im.width, H / im.height)
     im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
-    x = (im.width - W) // 2
-    y = round((im.height - H) * anchor_y)
+    x = round((im.width - W) * ax)
+    y = round((im.height - H) * ay)
     return im.crop((x, y, x + W, y + H))
 
 
