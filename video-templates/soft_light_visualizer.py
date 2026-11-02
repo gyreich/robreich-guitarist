@@ -31,6 +31,15 @@ PIECES = {
         "head": ("ROB REICH", "GRATEFUL", "FROM THE ALBUM WAKE UP"),
         "out": "rob-reich-grateful-soft-light-short.mp4",
     },
+    "thirty-seconds-madness": {
+        "audio": os.path.join(ROOT, "Album Wake Up Rob Reich", "09 30 Seconds Madness.mp3"),
+        "start": 90.0, "end": 142.0,
+        "head": ("ROB REICH", "30 SECONDS MADNESS", "FROM THE ALBUM WAKE UP"),
+        # cool and electric: sapphire, teal, ice, violet on midnight blue
+        "palette": [(70, 120, 255), (40, 210, 200), (190, 230, 255), (150, 100, 255)],
+        "bg": (6, 10, 22),
+        "out": "rob-reich-30-seconds-madness-soft-light-short.mp4",
+    },
 }
 
 PALETTE = [(255, 190, 110), (255, 150, 150), (200, 160, 255), (255, 210, 160)]   # amber, rose, lavender, peach
@@ -50,8 +59,9 @@ def loudness(src, start, dur):
 
 
 def color_at(t, offset):
-    p = (t / 20 + offset) % 1 * len(PALETTE)
-    a, b = PALETTE[int(p) % len(PALETTE)], PALETTE[(int(p) + 1) % len(PALETTE)]
+    pal = CUR.get("palette", PALETTE)
+    p = (t / 20 + offset) % 1 * len(pal)
+    a, b = pal[int(p) % len(pal)], pal[(int(p) + 1) % len(pal)]
     f = p - int(p)
     f = f * f * (3 - 2 * f)
     return tuple(int(a[i] + (b[i] - a[i]) * f) for i in range(3))
@@ -63,25 +73,36 @@ def title_layer(head):
     small, big, sub = head
     draw_tracked(d, W / 2, 150, small, fraunces(52, 560), TEXT, 10)
     d.rectangle((W / 2 - 50, 228, W / 2 + 50, 230), fill=GOLD)
-    draw_tracked(d, W / 2, 252, big, fraunces(118, 800), (247, 240, 226), 2)
+    size = 118
+    while d.textlength(big, font=fraunces(size, 800)) + 2 * len(big) > W - 100:
+        size -= 4
+    draw_tracked(d, W / 2, 252 + (118 - size) // 2, big, fraunces(size, 800), (247, 240, 226), 2)
     draw_tracked(d, W / 2, 400, sub, mono(30), GOLD, 3)
     return im
 
 
 def end_card(head):
-    im = Image.new("RGB", (W, H), (14, 10, 16))
+    im = Image.new("RGB", (W, H), CUR.get("bg", (14, 10, 16)))
     d = ImageDraw.Draw(im)
     small, big, sub = head
     draw_tracked(d, W / 2, 640, small, fraunces(64, 600), TEXT, 10)
-    draw_tracked(d, W / 2, 740, big, fraunces(110, 800), (247, 240, 226), 2)
+    size = 110
+    while d.textlength(big, font=fraunces(size, 800)) + 2 * len(big) > W - 100:
+        size -= 4
+    draw_tracked(d, W / 2, 740, big, fraunces(size, 800), (247, 240, 226), 2)
     d.rectangle((W / 2 - 70, 900, W / 2 + 70, 902), fill=GOLD)
     d.text((W / 2, 980), "from the album Wake Up", font=fraunces(52, 500), fill=TEXT_SOFT, anchor="mm")
     d.text((W / 2, 1080), "robreichguitar.com", font=mono(44, True), fill=GOLD_STRONG, anchor="mm")
     return im
 
 
+CUR = {}
+
+
 def build(key):
     p = PIECES[key]
+    CUR.clear()
+    CUR.update(p)
     music = p["end"] - p["start"]
     total = music + END_LEN
     lv = loudness(p["audio"], p["start"], music)
@@ -101,7 +122,7 @@ def build(key):
         t = f / FPS
         level = lv[min(f, len(lv) - 1)] if t < music else 0.0
         # light adds up like real light: soft gaussian orbs on a dark plum background
-        acc = np.zeros((SH, SW, 3)) + np.array([14, 10, 16], float)
+        acc = np.zeros((SH, SW, 3)) + np.array(CUR.get("bg", (14, 10, 16)), float)
         for o in orbs:                                       # drifting bokeh
             y = (o["y"] - o["v"] * t) % (SH + 80) - 40
             x = o["x"] + o["sway"] * math.sin(t * 0.25 + o["ph"])
