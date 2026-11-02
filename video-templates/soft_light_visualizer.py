@@ -148,8 +148,9 @@ def build(key):
     final = os.path.join(out_dir, p["out"])
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-framerate", str(FPS),
                     "-i", os.path.join(frames, "%05d.jpg"),
-                    "-ss", str(p["start"]), "-t", str(music), "-i", p["audio"],
-                    "-filter_complex", f"[1:a]afade=t=in:d=1.5,afade=t=out:st={music - 3:.3f}:d=3,apad=pad_dur={END_LEN}[a]",
+                    "-ss", str(p["start"]), "-t", str(total), "-i", p["audio"],
+                    # the music keeps playing under the closing card, fading over its last seconds
+                    "-filter_complex", f"[1:a]afade=t=in:d=1.5,afade=t=out:st={total - 2.5:.3f}:d=2.5,apad[a]",
                     "-map", "0:v", "-map", "[a]", "-t", f"{total:.3f}",
                     "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", "-preset", "slow",
                     "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", final], check=True)
