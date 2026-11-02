@@ -35,6 +35,20 @@ SHORTS = {
         ],
         "out": "rob-reich-new-swing-short.mp4",
     },
+    # Rob's solo on a 1994 band album: credits from the CD jacket
+    "mohegan-everythings-fried": {
+        "audio": os.path.join(ROOT, "Album Mohegan Fried", "02 Everything's Fried.mp3"),
+        "head": ("ROB REICH", "GUITAR SOLO", "MOHEGAN  \u00b7  EVERYTHING'S FRIED  \u00b7  1994"),
+        "card": ("ROB REICH", "on electric guitar", "Mohegan, Fried (1994)", "More of Rob's music:"),
+        "start": 154.5, "end": 181.8,
+        "photos": [
+            ("mohegan-fried-cover.jpg", "framed", None),
+            ("rob-hilltop-16m19s-closeup.jpg", "full", 0.40),     # ZeeZee Shots Photography
+            ("rob-hilltop-action-closeup.png", "full", 0.5),
+            ("rob-hilltop-action-with-drums.png", "full", 0.13),
+        ],
+        "out": "rob-reich-mohegan-everythings-fried-solo-short.mp4",
+    },
 }
 
 
@@ -65,22 +79,37 @@ def vertical(photo, mode, cx, path):
         bd.line([(0, y), (W, y)], fill=(8, 8, 12, int(200 * (1 - y / 520) ** 1.3)))
     im = im.convert("RGBA")
     im.alpha_composite(band)
-    d = ImageDraw.Draw(im)
-    draw_tracked(d, W / 2, 150, "ROB REICH", fraunces(52, 560), TEXT, 10)
-    d.rectangle((W / 2 - 50, 228, W / 2 + 50, 230), fill=GOLD)
-    draw_tracked(d, W / 2, 252, TITLE[0], fraunces(118, 800), (247, 240, 226), 2)
-    draw_tracked(d, W / 2, 400, "OFFICIAL AUDIO", mono(30), GOLD, 9)
     im.convert("RGB").resize((W * 2, H * 2), Image.LANCZOS).save(path)
+
+
+def title_layer(path):
+    """The title, drawn once and laid over every photo so it stays put through the dissolves."""
+    im = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    small, big, sub = SPEC[0].get("head", ("ROB REICH", SPEC[0].get("title", ""), "OFFICIAL AUDIO"))
+    draw_tracked(d, W / 2, 150, small, fraunces(52, 560), TEXT, 10)
+    d.rectangle((W / 2 - 50, 228, W / 2 + 50, 230), fill=GOLD)
+    draw_tracked(d, W / 2, 252, big, fraunces(118, 800), (247, 240, 226), 2)
+    draw_tracked(d, W / 2, 400, sub, mono(30), GOLD, 9 if len(sub) < 20 else 3)
+    im.save(path)
 
 
 def end_card(path):
     im = vignette(dark_canvas(W, H), strength=0.4)
     d = ImageDraw.Draw(im)
-    draw_tracked(d, W / 2, 620, "ROB REICH", fraunces(64, 600), TEXT, 10)
-    draw_tracked(d, W / 2, 720, TITLE[0], fraunces(110, 800), (247, 240, 226), 2)
-    d.rectangle((W / 2 - 70, 880, W / 2 + 70, 882), fill=GOLD)
-    d.text((W / 2, 960), "Hear the full track:", font=fraunces(56, 600), fill=TEXT, anchor="mm")
-    d.text((W / 2, 1034), "tap the video link below", font=fraunces(56, 600), fill=TEXT, anchor="mm")
+    if "card" in SPEC[0]:
+        name, role, where, more = SPEC[0]["card"]
+        draw_tracked(d, W / 2, 620, name, fraunces(96, 800), (247, 240, 226), 6)
+        d.text((W / 2, 790), role, font=fraunces(56, 500), fill=TEXT, anchor="mm")
+        d.text((W / 2, 862), where, font=fraunces(48, 400), fill=TEXT_SOFT, anchor="mm")
+        d.rectangle((W / 2 - 70, 930, W / 2 + 70, 932), fill=GOLD)
+        d.text((W / 2, 1034), more, font=fraunces(56, 600), fill=TEXT, anchor="mm")
+    else:
+        draw_tracked(d, W / 2, 620, "ROB REICH", fraunces(64, 600), TEXT, 10)
+        draw_tracked(d, W / 2, 720, SPEC[0]["title"], fraunces(110, 800), (247, 240, 226), 2)
+        d.rectangle((W / 2 - 70, 880, W / 2 + 70, 882), fill=GOLD)
+        d.text((W / 2, 960), "Hear the full track:", font=fraunces(56, 600), fill=TEXT, anchor="mm")
+        d.text((W / 2, 1034), "tap the video link below", font=fraunces(56, 600), fill=TEXT, anchor="mm")
     d.text((W / 2, 1140), "robreichguitar.com", font=mono(44, True), fill=GOLD_STRONG, anchor="mm")
     im.resize((W * 2, H * 2), Image.LANCZOS).save(path)
 
@@ -93,12 +122,12 @@ def push_in(png, seconds, out):
          "-frames:v", str(n), "-c:v", "libx264", "-preset", "medium", "-crf", "17", out])
 
 
-TITLE = [""]
+SPEC = [{}]
 
 
 def build(key):
     t = SHORTS[key]
-    TITLE[0] = t["title"]
+    SPEC[0] = t
     out_dir = os.path.join(HERE, "originals")
     tmp = os.path.join(out_dir, f".work-{key}-short")
     os.makedirs(tmp, exist_ok=True)
@@ -106,6 +135,8 @@ def build(key):
     total = music + END_LEN
     n = len(t["photos"])
     each = (music + n * XF) / n                  # photos fill the music; the end card follows
+    tl = os.path.join(tmp, "title.png")
+    title_layer(tl)
     clips = []
     for k, (photo, mode, cx) in enumerate(t["photos"]):
         png = os.path.join(tmp, f"v{k}.png")
@@ -127,10 +158,15 @@ def build(key):
         off += parts[k - 1][1] - XF
         fc.append(f"{label}[{k}:v]xfade=transition=fade:duration={XF}:offset={off:.3f}[v{k}]")
         label = f"[v{k}]"
+    # title on top of the photos, fading out as the end card dissolves in
+    fc.append(f"[{len(parts) + 1}:v]format=rgba,fade=t=out:st={music - XF:.3f}:d={XF}:alpha=1[tl];"
+              f"{label}[tl]overlay=0:0:shortest=0[vt]")
+    label = "[vt]"
     fc.append(f"[{len(parts)}:a]atrim=start={t['start']}:end={t['end']},asetpts=PTS-STARTPTS,"
               f"afade=t=in:d=0.4,afade=t=out:st={music - 2.5:.3f}:d=2.5,apad=pad_dur={END_LEN}[a]")
     final = os.path.join(out_dir, t["out"])
-    run(inputs + ["-i", t["audio"], "-filter_complex", ";".join(fc), "-map", label, "-map", "[a]",
+    run(inputs + ["-i", t["audio"], "-loop", "1", "-framerate", str(FPS), "-t", f"{total:.3f}", "-i", tl,
+                  "-filter_complex", ";".join(fc), "-map", label, "-map", "[a]",
                   "-t", f"{total:.3f}", "-c:v", "libx264", "-preset", "slow", "-crf", "19",
                   "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
                   "-movflags", "+faststart", final])
