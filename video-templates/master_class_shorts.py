@@ -158,9 +158,10 @@ SHORTS = {
     },
     "major-vs-minor": {
         "title": "Major vs. minor",
-        "pieces": [(189.8, 280.6)],
+        "pieces": [(185.6, 280.6)],      # opens on Rob's question; starts in the silence before "But"
         "captions": [
-            (189.9, 192.2, "The answer is what you call intervals."),
+            (185.6, 188.4, "But the question is: what makes them different?"),
+            (188.4, 192.2, "And the answer is what you call intervals."),
             (192.3, 194.6, "Intervals are distances between notes."),
             (195.9, 198.4, "On a guitar, if we play from C to D,"),
             (198.5, 200.3, "it's called the interval of a major second."),
@@ -188,7 +189,8 @@ SHORTS = {
             (277.2, 280.6, "each mode has a different interval construction."),
         ],
         "states": [
-            (189.8, 195.9, None, ("tag", "INTERVALS", "the distance between two notes")),
+            (185.6, 188.4, "all", ("tag", "WHAT MAKES THEM DIFFERENT?", "")),
+            (188.4, 195.9, None, ("tag", "INTERVALS", "the distance between two notes")),
             (195.9, 204.6, "Ionian", ("notes", (("C", 0), ("D", 0),), "MAJOR 2ND", "two frets apart")),
             (204.6, 212.8, None, ("notes", (("C", 0), ("Db", 1),), "MINOR 2ND", "one fret apart")),
             (212.8, 219.2, None, ("tag", "CHANGE AN INTERVAL", "and you change the color")),
