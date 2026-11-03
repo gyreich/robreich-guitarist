@@ -33,7 +33,7 @@ TRACKS = {
     "lift-off": {          # was "New Swing" (a working title); same recording as Homeward's "Lift Off"
         "audio": os.path.join(ROOT, "recordings", "lift-off.mp3"),
         "title": "LIFT OFF",
-        "album": None,
+        "album": "HOMEWARD",
         "photos": [
             ("walter-smith-photo-rob-pleasantdale-chateau-natural.jpg", "full", 0.0),
             ("rob-mezzrow-trio.png", "full", (0.0, 0.5)),       # trio at Mezzrow; keep Rob at left

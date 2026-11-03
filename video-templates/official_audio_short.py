@@ -26,6 +26,7 @@ SHORTS = {
     "lift-off": {          # was "New Swing"
         "audio": os.path.join(ROOT, "recordings", "lift-off.mp3"),
         "title": "LIFT OFF",
+        "head": ("ROB REICH", "LIFT OFF", "FROM THE ALBUM HOMEWARD"),
         "start": 113.0, "end": 152.3,      # the build to the loudest stretch
         "photos": [
             ("walter-smith-photo-rob-pleasantdale-chateau-natural.jpg", "full", 0.36),
