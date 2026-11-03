@@ -4,7 +4,7 @@ circles of light drift upward, a central glow breathes with the music (heavily
 smoothed so nothing flickers), colors drift amber -> rose -> lavender. Fades in
 from black; dissolves into a closing card.
 
-    python3 soft_light_visualizer.py grateful
+    python3 soft_light_visualizer.py badfinger grateful
 """
 import colorsys
 import math
@@ -25,26 +25,27 @@ SW, SH = 270, 480            # light is drawn small and scaled up: soft by natur
 FADE_IN, END_LEN, XF = 3.0, 5.0, 1.5
 
 PIECES = {
-    "grateful": {
-        "audio": os.path.join(ROOT, "Album Wake Up Rob Reich", "08 Grateful.mp3"),
+    # Track names fixed Nov 2026: the CD import had every title shifted by one track
+    "badfinger": {
+        "audio": os.path.join(ROOT, "Album Wake Up Rob Reich", "08 Badfinger.mp3"),
         "start": 450.0, "end": 528.0,
         # the studio headphones photo from the site gallery, warmed to rose/peach
         "intro_photo": "site-headphones-acoustic-studio-pink.jpg", "intro_framed": True,
-        "head": ("ROB REICH", "GRATEFUL", "FROM THE ALBUM WAKE UP"),
-        "out": "rob-reich-grateful-soft-light-short.mp4",
+        "head": ("ROB REICH", "BADFINGER", "FROM THE ALBUM WAKE UP"),
+        "out": "rob-reich-badfinger-soft-light-short.mp4",
     },
-    "thirty-seconds-madness": {
-        "audio": os.path.join(ROOT, "Album Wake Up Rob Reich", "09 30 Seconds Madness.mp3"),
+    "grateful": {
+        "audio": os.path.join(ROOT, "Album Wake Up Rob Reich", "09 Grateful.mp3"),
         "start": 90.0, "end": 142.0,
         "tail": 143.8,      # last notes ring out; a loud new phrase starts at 143.9, so silent by then
         "end_len": 3.0,
         # Rob's photo opens the Short (a frame to pick as the Shorts cover), then dissolves into the light
         "intro_photo": "about-section-photo.jpg",          # the About-section portrait
-        "head": ("ROB REICH", "30 SECONDS MADNESS", "FROM THE ALBUM WAKE UP"),
+        "head": ("ROB REICH", "GRATEFUL", "FROM THE ALBUM WAKE UP"),
         # cool and electric: sapphire, teal, ice, violet on midnight blue
         "palette": [(70, 120, 255), (40, 210, 200), (190, 230, 255), (150, 100, 255)],
         "bg": (6, 10, 22),
-        "out": "rob-reich-30-seconds-madness-soft-light-short.mp4",
+        "out": "rob-reich-grateful-soft-light-short.mp4",
     },
 }
 
