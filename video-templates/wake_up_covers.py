@@ -147,7 +147,29 @@ def back():
     return big.convert("RGB")
 
 
+def from_clean_art(path):
+    """Text-free artwork: no painting-out needed, just upscale and set the type."""
+    art = Image.open(path).convert("RGB")
+    side = min(art.size)
+    art = art.crop(((art.width - side) // 2, (art.height - side) // 2,
+                    (art.width + side) // 2, (art.height + side) // 2))
+    return upscale(art)
+
+
 if __name__ == "__main__":
+    import sys
+    if len(sys.argv) > 1:          # python3 wake_up_covers.py "<text-free art>" "<label>"
+        os.makedirs(OUT, exist_ok=True)
+        label = sys.argv[2] if len(sys.argv) > 2 else "new art"
+        base = from_clean_art(sys.argv[1])
+        title(base).convert("RGB").save(os.path.join(OUT, f"Wake Up - front cover 3000 ({label}).jpg"), quality=95)
+        _orig_upscale = upscale
+        upscale = lambda im: base          # back() reuses the same clean image
+        fill_holes = lambda im, m: im
+        b = back()
+        b.save(os.path.join(OUT, f"Wake Up - back cover 3000 ({label}).jpg"), quality=95)
+        print("done:", label)
+        raise SystemExit
     os.makedirs(OUT, exist_ok=True)
     f = front(); f.save(os.path.join(OUT, "Wake Up - front cover 3000.jpg"), quality=95)
     b = back(); b.save(os.path.join(OUT, "Wake Up - back cover 3000.jpg"), quality=95)
