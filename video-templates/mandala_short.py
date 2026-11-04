@@ -33,6 +33,16 @@ PIECES = {
         "bg": (7, 6, 15),
         "out": "rob-reich-moon-pie-mandala-short.mp4",
     },
+    "citi": {
+        "audio": os.path.join(ROOT, "Album Wake Up Rob Reich", "04 Citi.mp3"),
+        "start": 149.5, "end": 202.3,          # the build to the peak; it drops nearly silent at 3:22
+        "tail": 205.0,                         # last hit rings out under the card
+        "head": ("ROB REICH", "CITI", "FROM THE ALBUM WAKE UP"),
+        "intro_photo": "site-sunglasses-suit-sunburst-strat.jpg",
+        "bg": (5, 7, 16),
+        "hues": (0.47, 0.55),                  # city lights: cyan through magenta to gold
+        "out": "rob-reich-citi-mandala-short.mp4",
+    },
 }
 
 
@@ -59,7 +69,7 @@ def spectrum(src, start, dur):
     return spec
 
 
-def mandala(levels, t, prev, bg):
+def mandala(levels, t, prev, bg, hues=(0.0, 0.8)):
     w, h = W // SCALE, H // SCALE
     cx, cy = w / 2, 1150 / SCALE
     layer = Image.new("RGB", (w, h), (0, 0, 0))
@@ -67,7 +77,7 @@ def mandala(levels, t, prev, bg):
     nb, sym, rot = len(levels), 8, t * 9
     for k, v in enumerate(levels):
         r0, r1 = 90 / SCALE, (90 + 420 * v) / SCALE
-        hue = (k / nb * 0.8 + t / 12) % 1
+        hue = (hues[0] + k / nb * hues[1] + 0.06 * math.sin(t / 3)) % 1 if hues != (0.0, 0.8) else (k / nb * 0.8 + t / 12) % 1
         col = tuple(int(c * 255) for c in colorsys.hsv_to_rgb(hue, 0.85, 0.55 + 0.45 * min(v, 1)))
         for s in range(sym):
             for sign in (1, -1):
@@ -100,7 +110,7 @@ def build(key):
     for f in range(int(total * FPS)):
         t = f / FPS
         lv = spec[min(f, len(spec) - 1)] * (1.0 if t < music else max(0.0, 1 - (t - music) / 2))
-        im, prev = mandala(lv, t, prev, p["bg"])
+        im, prev = mandala(lv, t, prev, p["bg"], p.get("hues", (0.0, 0.8)))
         if t < INTRO_HOLD + INTRO_FADE:
             a = 1.0 if t < INTRO_HOLD else 1 - (t - INTRO_HOLD) / INTRO_FADE
             im = Image.blend(im, intro, a * a * (3 - 2 * a))
