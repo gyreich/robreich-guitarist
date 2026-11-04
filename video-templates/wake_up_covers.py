@@ -19,6 +19,7 @@ FONTS = os.path.join(HERE, "fonts")
 S = 3000
 CREAM, GOLD = (250, 240, 214), (244, 205, 120)
 
+NOTE = "All songs composed by Rob Reich except *Can't Find My Way Home (Steve Winwood)"
 TRACKS = ["Wake Up", "Moon Pie", "Grateful", "Citi", "R.V.W.", "New Day",
           "Can't Find My Way Home*", "Strut (Live)", "Badfinger"]   # Rob's corrected order
 
@@ -122,24 +123,26 @@ def back():
     m = text_mask(src, [(120, 150, 1140, 530), (180, 800, 1080, 1210)], 11)
     clean = fill_holes(src, m)
     big = upscale(clean).convert("RGBA")
-    # soft dark panel over the road for the track list
+    # soft dark panel over the road, sized to the widest line of text plus margins
+    f, small, note = serif(86, 500), serif(62, 400), italic(54)
+    probe = ImageDraw.Draw(big)
+    rows = [TRACKS[:3], TRACKS[3:6], TRACKS[6:]]
+    lines = ["     ".join(f"{TRACKS.index(t) + 1}. {t}" for t in r) for r in rows]
+    widest = max([probe.textlength(l, font=f) for l in lines] +
+                 [probe.textlength(NOTE, font=note)])
+    half = widest / 2 + 120
     panel = Image.new("RGBA", big.size, (0, 0, 0, 0))
-    ImageDraw.Draw(panel).rounded_rectangle((330, 1560, S - 330, 2700), 80, fill=(16, 10, 34, 175))
-    big.alpha_composite(panel.filter(ImageFilter.GaussianBlur(30)))
+    ImageDraw.Draw(panel).rounded_rectangle((S / 2 - half, 1560, S / 2 + half, 2700), 80, fill=(16, 10, 34, 180))
+    big.alpha_composite(panel.filter(ImageFilter.GaussianBlur(24)))
     big = title(big.convert("RGB"), 300, 620)
     d = ImageDraw.Draw(big)
-    f = serif(92, 500)
     y = 1660
-    for row in (TRACKS[:3], TRACKS[3:6], TRACKS[6:]):
-        line = "     ".join(f"{TRACKS.index(t) + 1}. {t}" for t in row)
+    for line in lines:
         centered(d, y, line, f, CREAM, shadow=False)
         y += 140
-    small = serif(64, 400)
     centered(d, y + 50, "Rob Reich: guitar  ·  Matt King: keyboards", small, GOLD, shadow=False)
     centered(d, y + 140, "Stephan Crump: bass  ·  Aaron Comess: drums", small, GOLD, shadow=False)
-    note = italic(58)
-    centered(d, y + 270, "All songs composed by Rob Reich except *Can't Find My Way Home (Steve Winwood)",
-             note, (225, 215, 200), shadow=False)
+    centered(d, y + 270, NOTE, note, (225, 215, 200), shadow=False)
     centered(d, y + 390, "© 2026 Rob Reich  ·  robreichguitar.com", serif(60, 400), (225, 215, 200), shadow=False)
     return big.convert("RGB")
 
