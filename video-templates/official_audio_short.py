@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw
 
 from brand import fraunces, mono, TEXT, GOLD, GOLD_STRONG, TEXT_SOFT, draw_tracked, vignette
 from portrait_frame import dark_canvas, place_portrait
-from official_audio_video import GAL, FPS, run
+from official_audio_video import GAL, FPS, run, smooth_push
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -116,11 +116,7 @@ def end_card(path):
 
 
 def push_in(png, seconds, out):
-    n = int(round(seconds * FPS))
-    run(["-loop", "1", "-framerate", str(FPS), "-t", f"{seconds:.3f}", "-i", png,
-         "-vf", f"zoompan=z='1+0.07*on/{n}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
-                f"d=1:s={W}x{H}:fps={FPS},format=yuv420p",
-         "-frames:v", str(n), "-c:v", "libx264", "-preset", "medium", "-crf", "17", out])
+    smooth_push(png, seconds, out, W, H, 0.07)
 
 
 SPEC = [{}]

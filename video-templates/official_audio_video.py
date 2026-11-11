@@ -82,12 +82,27 @@ def still(photo, mode, anchor_y, path):
     im.resize((W * 2, H * 2), Image.LANCZOS).save(path)
 
 
-def push_in(png, seconds, out):
+def smooth_push(png, seconds, out, w, h, zoom):
+    """Slow centered push-in, drawn frame by frame with sub-pixel crops.
+    (ffmpeg's zoompan snaps to whole pixels, so very slow zooms visibly step.)"""
+    src = Image.open(png).convert("RGB")
     n = int(round(seconds * FPS))
-    run(["-loop", "1", "-framerate", str(FPS), "-t", f"{seconds:.3f}", "-i", png,
-         "-vf", f"zoompan=z='1+0.05*on/{n}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
-                f"d=1:s={W}x{H}:fps={FPS},format=yuv420p",
-         "-frames:v", str(n), "-c:v", "libx264", "-preset", "medium", "-crf", "16", out])
+    p = subprocess.Popen(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                          "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{w}x{h}", "-r", str(FPS),
+                          "-i", "-", "-pix_fmt", "yuv420p", "-c:v", "libx264", "-preset", "medium",
+                          "-crf", "16", out], stdin=subprocess.PIPE)
+    cx, cy = src.width / 2, src.height / 2
+    for i in range(n):
+        z = 1 + zoom * i / max(1, n - 1)
+        hw, hh = src.width / z / 2, src.height / z / 2
+        p.stdin.write(src.resize((w, h), Image.BICUBIC, box=(cx - hw, cy - hh, cx + hw, cy + hh)).tobytes())
+    p.stdin.close()
+    if p.wait():
+        raise RuntimeError("ffmpeg failed: " + out)
+
+
+def push_in(png, seconds, out):
+    smooth_push(png, seconds, out, W, H, 0.05)
 
 
 def hold(png, seconds, out):
