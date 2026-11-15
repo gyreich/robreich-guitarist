@@ -369,13 +369,16 @@
   }
 
   /* ---------- ABOUT ---------- */
+  /* Portrait floats left; the bio wraps beside it and continues underneath */
   .about-grid {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 56px;
-    align-items: start;
+    display: flow-root;
   }
-  .about-portrait { position: relative; }
+  .about-portrait {
+    position: relative;
+    float: left;
+    width: 300px;
+    margin: 6px 44px 20px 0;
+  }
   .about-portrait img {
     width: 100%;
     display: block;
@@ -385,7 +388,7 @@
   .about-body p {
     font-size: 17.5px;
     color: var(--text);
-    max-width: 62ch;
+    max-width: 960px;
   }
   .about-body p + p { margin-top: 20px; }
   .about-body a {
@@ -396,6 +399,7 @@
   }
   .about-body a:hover, .about-body a:focus-visible { color: var(--gold); }
   .credits {
+    clear: both;
     margin-top: 36px;
     padding-top: 28px;
     border-top: 1px solid var(--line);
@@ -408,22 +412,30 @@
     color: var(--text-soft);
     margin-bottom: 14px;
   }
-  .credits-intro {
+  .about-body .credits-intro {
     font-size: 14.5px;
     color: var(--text-soft);
-    max-width: 56ch;
+    max-width: none;
     margin-bottom: 16px;
   }
+  /* Credits roll: names run down columns across the full width */
   .credits-names {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    columns: 4 140px;
+    column-gap: 32px;
     font-size: 15px;
     line-height: 1.85;
     color: var(--text-soft);
-    max-width: 62ch;
+  }
+  .credits-names li { break-inside: avoid; }
+  @media (max-width: 600px) {
+    .credits-names { columns: 2; column-gap: 20px; font-size: 14.5px; }
   }
 
   @media (max-width: 760px) {
-    .about-grid { grid-template-columns: 1fr; }
-    .about-portrait { max-width: 220px; }
+    .about-portrait { width: 40%; max-width: 220px; margin: 4px 20px 12px 0; }
   }
 
   /* ---------- LIVE ---------- */
@@ -562,14 +574,18 @@
   }
 
   /* ---------- GALLERY ---------- */
+  /* Justified rows: every row is one height and runs edge to edge (sized by the script below) */
   .gallery-grid {
     margin-top: 8px;
-    columns: 3 260px;
-    column-gap: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    row-gap: 18px;
   }
   .gitem {
-    margin: 0 0 22px;
-    break-inside: avoid;
+    margin: 0;
+    width: calc((100% - 32px) / 3); /* fallback before the script runs */
   }
   .gbtn {
     display: block;
@@ -622,9 +638,6 @@
     letter-spacing: 0.02em;
     color: var(--text-soft);
     text-wrap: balance;
-  }
-  @media (max-width: 640px) {
-    .gallery-grid { columns: 1 100%; }
   }
 
   /* ---------- LIGHTBOX ---------- */
@@ -1266,7 +1279,37 @@
         <div class="credits">
           <div class="credits-label">Selected performance credits</div>
           <p class="credits-intro">Over the years, Rob has performed with musicians and artists across jazz, rock, funk, R&amp;B, hip-hop, rap and pop, including:</p>
-          <p class="credits-names">Eliot&nbsp;Zigmund &middot; Bucky&nbsp;Pizzarelli &middot; Vic&nbsp;Juris &middot; Peter&nbsp;Bernstein &middot; Warren&nbsp;Vach&eacute; &middot; Peter&nbsp;Cincotti &middot; Fred&nbsp;Wesley &middot; Rufus&nbsp;Reid &middot; Cameron&nbsp;Brown &middot; Matt&nbsp;Wilson &middot; Harvie&nbsp;S &middot; Earl&nbsp;Sauls &middot; James&nbsp;Genus &middot; Ben&nbsp;Perowsky &middot; Billy&nbsp;Mintz &middot; Tony&nbsp;Malaby &middot; Tim&nbsp;Berne &middot; Eric&nbsp;Alexander &middot; Jay&nbsp;Azzolina &middot; Chris&nbsp;Cheek &middot; Bill&nbsp;Crow &middot; Rene&nbsp;Hart &middot; Allan&nbsp;Namery &middot; Stephanie&nbsp;Mills &middot; Freddie&nbsp;Jackson &middot; The&nbsp;Fat&nbsp;Boys &middot; The&nbsp;Sugarhill&nbsp;Gang &middot; Elliot&nbsp;Lurie &middot; Peter&nbsp;Beckett</p>
+          <ul class="credits-names">
+            <li>Eliot&nbsp;Zigmund</li>
+            <li>Bucky&nbsp;Pizzarelli</li>
+            <li>Vic&nbsp;Juris</li>
+            <li>Peter&nbsp;Bernstein</li>
+            <li>Warren&nbsp;Vach&eacute;</li>
+            <li>Peter&nbsp;Cincotti</li>
+            <li>Fred&nbsp;Wesley</li>
+            <li>Rufus&nbsp;Reid</li>
+            <li>Cameron&nbsp;Brown</li>
+            <li>Matt&nbsp;Wilson</li>
+            <li>Harvie&nbsp;S</li>
+            <li>Earl&nbsp;Sauls</li>
+            <li>James&nbsp;Genus</li>
+            <li>Ben&nbsp;Perowsky</li>
+            <li>Billy&nbsp;Mintz</li>
+            <li>Tony&nbsp;Malaby</li>
+            <li>Tim&nbsp;Berne</li>
+            <li>Eric&nbsp;Alexander</li>
+            <li>Jay&nbsp;Azzolina</li>
+            <li>Chris&nbsp;Cheek</li>
+            <li>Bill&nbsp;Crow</li>
+            <li>Rene&nbsp;Hart</li>
+            <li>Allan&nbsp;Namery</li>
+            <li>Stephanie&nbsp;Mills</li>
+            <li>Freddie&nbsp;Jackson</li>
+            <li>The&nbsp;Fat&nbsp;Boys</li>
+            <li>The&nbsp;Sugarhill&nbsp;Gang</li>
+            <li>Elliot&nbsp;Lurie</li>
+            <li>Peter&nbsp;Beckett</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -2187,6 +2230,42 @@
       if (e.key === 'ArrowRight') next();
       if (e.key === 'ArrowLeft') prev();
     });
+  })();
+
+  // ---------- Photos: justified rows ----------
+  (function () {
+    var grid = document.querySelector('.gallery-grid');
+    if (!grid) return;
+    var items = Array.prototype.slice.call(grid.querySelectorAll('.gitem'));
+    var ratios = items.map(function (it) {
+      var img = it.querySelector('img');
+      var w = +img.getAttribute('width'), h = +img.getAttribute('height');
+      return w && h ? w / h : 1;
+    });
+    var GAP = 16;
+    function layout() {
+      var W = grid.clientWidth - 1; // 1px slack so rounding never forces a wrap
+      if (W <= 0) return;
+      var target = W < 600 ? 170 : 270;
+      var rows = [], row = [], sum = 0;
+      ratios.forEach(function (r, i) {
+        row.push(i); sum += r;
+        if (sum * target + GAP * (row.length - 1) >= W) { rows.push(row); row = []; sum = 0; }
+      });
+      if (row.length) {
+        var lastH = (W - GAP * (row.length - 1)) / sum;
+        if (lastH > target * 1.6 && rows.length) rows[rows.length - 1] = rows[rows.length - 1].concat(row);
+        else rows.push(row);
+      }
+      rows.forEach(function (r) {
+        var s = r.reduce(function (a, i) { return a + ratios[i]; }, 0);
+        var h = (W - GAP * (r.length - 1)) / s;
+        r.forEach(function (i) { items[i].style.width = (ratios[i] * h) + 'px'; });
+      });
+    }
+    layout();
+    if (window.ResizeObserver) new ResizeObserver(layout).observe(grid);
+    else window.addEventListener('resize', layout);
   })();
 
   // ---------- Live playlist tabs ----------
